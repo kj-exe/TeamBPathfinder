@@ -2,6 +2,8 @@
 
 #pragma managed(push, off)
 #include "GameEngine.h"
+#include "PuzzleRepository.h"
+#include "GameController.h"
 #pragma managed(pop)
 
 #include "GridPanel.h"
@@ -20,8 +22,13 @@ namespace TeamBPathfinder {
 		{
 			InitializeComponent();
 			gameEngine = new GameEngine();
+			repository = new PuzzleRepository();
+			controller = new GameController(gameEngine, repository);
+
 			SetupGrid();
-			LoadPuzzleA();
+			controller->startPuzzle(0);
+			RefreshGrid();
+			UpdatePuzzleLabel();
 		}
 
 	protected:
@@ -29,6 +36,12 @@ namespace TeamBPathfinder {
 		{
 			if (components)
 				delete components;
+
+			if (controller)
+				delete controller;
+
+			if (repository)
+				delete repository;
 
 			if (gameEngine)
 				delete gameEngine;
@@ -41,6 +54,8 @@ namespace TeamBPathfinder {
 		Label^ labelPuzzle;
 		System::ComponentModel::Container^ components;
 		GameEngine* gameEngine;
+		PuzzleRepository* repository;
+		GameController* controller;
 		GridPanel^ gridPanel;
 
 #pragma region Windows Form Designer generated code
@@ -77,116 +92,25 @@ namespace TeamBPathfinder {
 			this->Controls->Add(gridPanel);
 		}
 
-		void LoadPuzzleA()
-		{
-			gameEngine->initBoard();
-
-			gameEngine->setFixed(0, 0, 1);
-			gameEngine->setFixed(0, 7, 8);
-			gameEngine->setFixed(1, 1, 29);
-			gameEngine->setFixed(1, 6, 44);
-			gameEngine->setFixed(3, 2, 56);
-			gameEngine->setFixed(3, 5, 49);
-			gameEngine->setFixed(5, 2, 58);
-			gameEngine->setFixed(5, 5, 61);
-			gameEngine->setFixed(6, 1, 34);
-			gameEngine->setFixed(6, 6, 39);
-			gameEngine->setFixed(7, 0, 22);
-			gameEngine->setFixed(7, 7, 15);
-
-			gameEngine->setFixed(0, 5, 6);
-			gameEngine->setFixed(0, 1, 2);
-			gameEngine->setFixed(2, 0, 27);
-			gameEngine->setFixed(4, 0, 25);
-			gameEngine->setFixed(7, 4, 18);
-			gameEngine->setFixed(3, 3, 51);
-			gameEngine->setFixed(7, 2, 20);
-			gameEngine->setFixed(6, 0, 23);
-			gameEngine->setFixed(5, 0, 24);
-			gameEngine->setFixed(3, 1, 31);
-			gameEngine->setFixed(6, 3, 36);
-			gameEngine->setFixed(2, 7, 10);
-			gameEngine->setFixed(4, 7, 12);
-			gameEngine->setFixed(5, 7, 13);
-			gameEngine->setFixed(6, 7, 14);
-			gameEngine->setFixed(6, 6, 39);
-			gameEngine->setFixed(1, 2, 54);
-			gameEngine->setFixed(1, 4, 46);
-			gameEngine->setFixed(2, 4, 47);
-			gameEngine->setFixed(4, 5, 62);
-			gameEngine->setFixed(4, 6, 41);
-			gameEngine->setFixed(3, 6, 42);
-			gameEngine->setFixed(2, 6, 43);
-			gameEngine->setFixed(0, 2, 3);
-			gameEngine->setFixed(0, 4, 5);
-
-			gameEngine->setFixed(2, 1, 30);
-			gameEngine->setFixed(1, 0, 28);
-			gameEngine->setFixed(4, 1, 32);
-			gameEngine->setFixed(5, 1, 33);
-			gameEngine->setFixed(7, 1, 21);
-			gameEngine->setFixed(7, 3, 19);
-			gameEngine->setFixed(1, 3, 53);
-			gameEngine->setFixed(1, 5, 45);
-			gameEngine->setFixed(2, 5, 48);
-			gameEngine->setFixed(6, 5, 38);
-			gameEngine->setFixed(7, 5, 17);
-			gameEngine->setFixed(2, 2, 55);
-			gameEngine->setFixed(2, 3, 52);
-			gameEngine->setFixed(4, 3, 64);
-			gameEngine->setFixed(4, 2, 57);
-			gameEngine->setFixed(6, 2, 35);
-			gameEngine->setFixed(5, 3, 59);
-			gameEngine->setFixed(5, 4, 60);
-			gameEngine->setFixed(6, 4, 37);
-			gameEngine->setFixed(5, 6, 40);
-			gameEngine->setFixed(0, 3, 4);
-			gameEngine->setFixed(1, 7, 9);
-			gameEngine->setFixed(3, 4, 50);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			RefreshGrid();
-		}
-
 		void RefreshGrid()
 		{
 			for (int row = 0; row < GridPanel::BOARD_SIZE; row++)
 				for (int col = 0; col < GridPanel::BOARD_SIZE; col++)
-					gridPanel->UpdateCell(row, col, gameEngine->getValue(row, col), gameEngine->isFixed(row, col));
+					gridPanel->UpdateCell(row, col, controller->getValue(row, col), controller->isFixed(row, col));
+		}
+
+		void UpdatePuzzleLabel()
+		{
+			labelPuzzle->Text = "Puzzle " + controller->getCurrentPuzzleNumber().ToString();
 		}
 
 		void HandleCellInput(int row, int col, String^ text)
 		{
-			if (gameEngine->isFixed(row, col))
-				return;
-
 			if (String::IsNullOrEmpty(text))
 			{
-				gameEngine->removeNumber(row, col);
-				gridPanel->ResetCellColor(row, col);
+				MoveResult result = controller->clearCell(row, col);
+				if (result == MoveResult::Cleared)
+					gridPanel->ResetCellColor(row, col);
 				return;
 			}
 
@@ -198,36 +122,36 @@ namespace TeamBPathfinder {
 				return;
 			}
 
-			AttemptMove(row, col, value);
-		}
+			MoveResult result = controller->attemptMove(row, col, value);
 
-		void AttemptMove(int row, int col, int value)
-		{
-			gameEngine->removeNumber(row, col);
-
-			if (!gameEngine->placeNumber(row, col, value))
+			switch (result)
 			{
+			case MoveResult::Accepted:
+				gridPanel->ResetCellColor(row, col);
+				break;
+
+			case MoveResult::InvalidNumber:
 				ShowMessage(
 					"Invalid move! Number " + value.ToString() + " is either out of range or already on the board.",
 					"Invalid Move"
 				);
 				gridPanel->ClearCell(row, col);
-				return;
-			}
+				break;
 
-			gridPanel->ResetCellColor(row, col);
-			CheckForCompletion();
-		}
+			case MoveResult::InvalidCell:
+				gridPanel->ClearCell(row, col);
+				break;
 
-		void CheckForCompletion()
-		{
-			if (!gameEngine->isBoardComplete())
-				return;
-
-			if (gameEngine->isSolutionCorrect())
+			case MoveResult::PuzzleSolved:
+				gridPanel->ResetCellColor(row, col);
 				ShowMessage("Congratulations! You solved the puzzle!", "Puzzle Complete");
-			else
+				break;
+
+			case MoveResult::PuzzleIncorrect:
+				gridPanel->ResetCellColor(row, col);
 				ShowMessage("The board is full but the solution is not correct. Keep trying!", "Not Quite");
+				break;
+			}
 		}
 
 		void ShowMessage(String^ message, String^ title)

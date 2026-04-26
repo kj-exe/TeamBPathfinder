@@ -102,6 +102,9 @@ namespace TeamBPathfinder {
 		void Cell_Leave(Object^ sender, EventArgs^ e)
 		{
 			TextBox^ cell = safe_cast<TextBox^>(sender);
+			if (cell->ReadOnly)
+				return;
+
 			Point^ position = safe_cast<Point^>(cell->Tag);
 			OnCellInput(position->X, position->Y, cell->Text->Trim());
 		}

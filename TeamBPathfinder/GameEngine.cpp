@@ -19,6 +19,16 @@ void GameEngine::initBoard()
 	}
 }
 
+void GameEngine::loadFromPuzzle(const Puzzle& puzzle)
+{
+	initBoard();
+	const std::vector<Clue>& clues = puzzle.getClues();
+	for (size_t i = 0; i < clues.size(); i++)
+	{
+		setFixed(clues[i].row, clues[i].col, clues[i].value);
+	}
+}
+
 void GameEngine::setFixed(int row, int col, int value)
 {
 	board[row][col] = value;
