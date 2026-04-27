@@ -13,42 +13,62 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\View">
+      <UniqueIdentifier>{662eccc2-3889-4aa2-b127-8dc2cfcd0093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{26432a71-7add-4a88-bd2c-fe3314be7c5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Controller">
+      <UniqueIdentifier>{08a2aea7-234d-4cd2-8162-9915b9491ac7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{271d997a-677f-440f-847f-064eaab6f263}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MainForm.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="View\MainForm.cpp">
+      <Filter>Source Files\View</Filter>
     </ClCompile>
-    <ClCompile Include="GameEngine.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Engine\GameEngine.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="GameController.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Controller\GameController.cpp">
+      <Filter>Source Files\Controller</Filter>
     </ClCompile>
-    <ClCompile Include="Puzzle.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Model\Puzzle.cpp">
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="PuzzleRepository.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Model\PuzzleRepository.cpp">
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MainForm.h">
+    <ClInclude Include="Controller\GameController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameEngine.h">
+    <ClInclude Include="Engine\GameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GridPanel.h">
+    <ClInclude Include="View\GridPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameController.h">
+    <ClInclude Include="View\MainForm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Puzzle.h">
+    <ClInclude Include="Model\Puzzle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PuzzleRepository.h">
+    <ClInclude Include="Model\PuzzleRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="View\MainForm.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\MainForm.resx">
+      <Filter>Source Files\View</Filter>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

@@ -120,26 +120,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameController.cpp" />
-    <ClCompile Include="GameEngine.cpp" />
-    <ClCompile Include="MainForm.cpp" />
-    <ClCompile Include="Puzzle.cpp" />
-    <ClCompile Include="PuzzleRepository.cpp" />
+    <ClCompile Include="Controller\GameController.cpp" />
+    <ClCompile Include="Engine\GameEngine.cpp" />
+    <ClCompile Include="Model\Puzzle.cpp" />
+    <ClCompile Include="Model\PuzzleRepository.cpp" />
+    <ClCompile Include="View\MainForm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameController.h" />
-    <ClInclude Include="GameEngine.h" />
-    <ClInclude Include="GridPanel.h" />
-    <ClInclude Include="MainForm.h">
-      <FileType>CppForm</FileType>
-    </ClInclude>
-    <ClInclude Include="Puzzle.h" />
-    <ClInclude Include="PuzzleRepository.h" />
+    <ClInclude Include="Controller\GameController.h" />
+    <ClInclude Include="Engine\GameEngine.h" />
+    <ClInclude Include="Model\Puzzle.h" />
+    <ClInclude Include="Model\PuzzleRepository.h" />
+    <ClInclude Include="View\GridPanel.h" />
+	  <ClInclude Include="View\MainForm.h">
+		  <FileType>CppForm</FileType>
+	  </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.h</DependentUpon>
-    </EmbeddedResource>
+	  <EmbeddedResource Include="View\MainForm.resx">
+		  <DependentUpon>MainForm.h</DependentUpon>
+	  </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,9 +1,9 @@
 #pragma once
 
 #pragma managed(push, off)
-#include "GameEngine.h"
-#include "PuzzleRepository.h"
-#include "GameController.h"
+#include "../Engine/GameEngine.h"
+#include "../Model/PuzzleRepository.h"
+#include "../Controller/GameController.h"
 #pragma managed(pop)
 
 #include "GridPanel.h"
@@ -25,6 +25,7 @@ namespace TeamBPathfinder {
 			repository = new PuzzleRepository();
 			controller = new GameController(gameEngine, repository);
 
+			SetUpUI();
 			SetupGrid();
 			controller->startPuzzle(0);
 			RefreshGrid();
@@ -56,13 +57,40 @@ namespace TeamBPathfinder {
 		GameEngine* gameEngine;
 		PuzzleRepository* repository;
 		GameController* controller;
-		GridPanel^ gridPanel;
+	private: System::Windows::Forms::Button^ resetButton;
+
+		   GridPanel^ gridPanel;
 
 #pragma region Windows Form Designer generated code
 		void InitializeComponent(void)
 		{
-			this->labelPuzzle = (gcnew Label());
+			this->resetButton = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
+			// 
+			// resetButton
+			// 
+			this->resetButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->resetButton->Location = System::Drawing::Point(12, 501);
+			this->resetButton->Name = L"resetButton";
+			this->resetButton->Size = System::Drawing::Size(100, 40);
+			this->resetButton->TabIndex = 0;
+			this->resetButton->Text = L"Reset";
+			this->resetButton->UseVisualStyleBackColor = true;
+			this->resetButton->Click += gcnew System::EventHandler(this, &MainForm::resetButton_Click);
+			// 
+			// MainForm
+			// 
+			this->ClientSize = System::Drawing::Size(482, 570);
+			this->Controls->Add(this->resetButton);
+			this->Name = L"MainForm";
+			this->ResumeLayout(false);
+
+		}
+#pragma endregion
+		void SetUpUI()
+		{
+			this->labelPuzzle = (gcnew Label());
 
 			this->labelPuzzle->AutoSize = true;
 			this->labelPuzzle->Font = (gcnew Drawing::Font(L"Segoe UI", 14, FontStyle::Bold));
@@ -70,19 +98,16 @@ namespace TeamBPathfinder {
 			this->labelPuzzle->Text = L"Puzzle 1";
 
 			int formWidth = GRID_MARGIN * 2 + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
-			int formHeight = GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 40;
+			int formHeight = GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 80;
 
-			this->AutoScaleDimensions = SizeF(6, 13);
-			this->AutoScaleMode = Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = Drawing::Size(formWidth, formHeight);
 			this->Controls->Add(this->labelPuzzle);
-			this->Name = L"MainForm";
 			this->Text = L"Pathfinder 64 by Andrews & Miranda";
-
-			this->ResumeLayout(false);
-			this->PerformLayout();
+			this->resetButton->Location = Point(
+				GRID_MARGIN,
+				GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 10
+			);
 		}
-#pragma endregion
 
 		void SetupGrid()
 		{
@@ -158,5 +183,9 @@ namespace TeamBPathfinder {
 		{
 			MessageBox::Show(message, title, MessageBoxButtons::OK, MessageBoxIcon::Information);
 		}
-	};
+	private: System::Void resetButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		this->controller->resetCurrentPuzzle();
+		this->RefreshGrid();
+	}
+};
 }

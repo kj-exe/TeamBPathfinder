@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GameEngine.h"
-#include "PuzzleRepository.h"
+#include "../Engine/GameEngine.h"
+#include "../Model/PuzzleRepository.h"
 
 enum class MoveResult
 {
