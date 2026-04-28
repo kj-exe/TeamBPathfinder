@@ -39,14 +39,6 @@ MoveResult GameController::attemptMove(int row, int col, int value)
     if (!engine->placeNumber(row, col, value))
         return MoveResult::InvalidNumber;
 
-    if (engine->isBoardComplete())
-    {
-        if (engine->isSolutionCorrect())
-            return MoveResult::PuzzleSolved;
-        else
-            return MoveResult::PuzzleIncorrect;
-    }
-
     return MoveResult::Accepted;
 }
 
@@ -67,4 +59,13 @@ int GameController::getValue(int row, int col)
 bool GameController::isFixed(int row, int col)
 {
     return engine->isFixed(row, col);
+}
+
+MoveResult GameController::submitPuzzle()
+{
+    if (!engine->isBoardComplete())
+        return MoveResult::InvalidNumber;
+    if (engine->isSolutionCorrect())
+        return MoveResult::PuzzleSolved;
+    return MoveResult::PuzzleIncorrect;
 }

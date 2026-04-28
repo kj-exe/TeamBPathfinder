@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #pragma managed(push, off)
-#include "GameEngine.h"
+#include "../Engine/GameEngine.h"
 #pragma managed(pop)
 
 namespace TeamBPathfinder {
