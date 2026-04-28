@@ -30,6 +30,7 @@ public:
 
     MoveResult attemptMove(int row, int col, int value);
     MoveResult clearCell(int row, int col);
+    MoveResult submitPuzzle();
 
     int getValue(int row, int col);
     bool isFixed(int row, int col);

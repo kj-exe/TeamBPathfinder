@@ -70,5 +70,8 @@
     <EmbeddedResource Include="View\MainForm.resx">
       <Filter>Source Files\View</Filter>
     </EmbeddedResource>
+    <EmbeddedResource Include="View\MainForm.resx">
+      <Filter>Source Files\View</Filter>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
