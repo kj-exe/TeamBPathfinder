@@ -53,17 +53,14 @@ namespace TeamBPathfinder
 		static const int GRID_TOP = 50;
 
 		Label^ labelPuzzle;
+		Button^ debugSolveButton;
 		System::ComponentModel::Container^ components;
 		GameEngine* gameEngine;
 		PuzzleRepository* repository;
 		GameController* controller;
 
-	private:
 		System::Windows::Forms::Button^ resetButton;
-
-	private:
 		System::Windows::Forms::Button^ submitButton;
-
 
 		GridPanel^ gridPanel;
 
@@ -73,13 +70,11 @@ namespace TeamBPathfinder
 			this->resetButton = (gcnew System::Windows::Forms::Button());
 			this->submitButton = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
-			// 
-			// resetButton
-			// 
+
 			this->resetButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12,
-			                                                       System::Drawing::FontStyle::Regular,
-			                                                       System::Drawing::GraphicsUnit::Point,
-			                                                       static_cast<System::Byte>(0)));
+				System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
 			this->resetButton->Location = System::Drawing::Point(12, 501);
 			this->resetButton->Name = L"resetButton";
 			this->resetButton->Size = System::Drawing::Size(100, 40);
@@ -87,13 +82,11 @@ namespace TeamBPathfinder
 			this->resetButton->Text = L"Reset";
 			this->resetButton->UseVisualStyleBackColor = true;
 			this->resetButton->Click += gcnew System::EventHandler(this, &MainForm::resetButton_Click);
-			// 
-			// submitButton
-			// 
+
 			this->submitButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12,
-			                                                        System::Drawing::FontStyle::Regular,
-			                                                        System::Drawing::GraphicsUnit::Point,
-			                                                        static_cast<System::Byte>(0)));
+				System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
 			this->submitButton->Location = System::Drawing::Point(343, 501);
 			this->submitButton->Name = L"submitButton";
 			this->submitButton->Size = System::Drawing::Size(100, 40);
@@ -101,9 +94,7 @@ namespace TeamBPathfinder
 			this->submitButton->Text = L"Submit";
 			this->submitButton->UseVisualStyleBackColor = true;
 			this->submitButton->Click += gcnew System::EventHandler(this, &MainForm::submitButton_Click);
-			// 
-			// MainForm
-			// 
+
 			this->ClientSize = System::Drawing::Size(482, 570);
 			this->Controls->Add(this->submitButton);
 			this->Controls->Add(this->resetButton);
@@ -111,29 +102,32 @@ namespace TeamBPathfinder
 			this->ResumeLayout(false);
 		}
 #pragma endregion
+
 		void SetUpUI()
 		{
-			this->labelPuzzle = (gcnew Label());
+			int formWidth = GRID_MARGIN * 2 + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
+			int formHeight = GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 80;
+			int buttonRowY = GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 10;
 
+			this->labelPuzzle = (gcnew Label());
 			this->labelPuzzle->AutoSize = true;
 			this->labelPuzzle->Font = (gcnew Drawing::Font(L"Segoe UI", 14, FontStyle::Bold));
 			this->labelPuzzle->Location = Point(GRID_MARGIN, 12);
 			this->labelPuzzle->Text = L"Puzzle 1";
 
-			int formWidth = GRID_MARGIN * 2 + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
-			int formHeight = GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 80;
+			this->debugSolveButton = (gcnew Button());
+			this->debugSolveButton->Text = L"Debug: Solve";
+			this->debugSolveButton->Size = Drawing::Size(120, 30);
+			this->debugSolveButton->Location = Point(GRID_MARGIN + 240, buttonRowY + 5);
+			this->debugSolveButton->Click += gcnew EventHandler(this, &MainForm::OnDebugSolveClicked);
+			this->Controls->Add(this->debugSolveButton);
 
 			this->ClientSize = Drawing::Size(formWidth, formHeight);
 			this->Controls->Add(this->labelPuzzle);
 			this->Text = L"Pathfinder 64 by Andrews & Miranda";
-			this->resetButton->Location = Point(
-				GRID_MARGIN,
-				GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 10
-			);
-			this->submitButton->Location = Point(
-				GRID_MARGIN + 120,
-				GRID_TOP + GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 10
-			);
+
+			this->resetButton->Location = Point(GRID_MARGIN, buttonRowY);
+			this->submitButton->Location = Point(GRID_MARGIN + 120, buttonRowY);
 		}
 
 		void SetupGrid()
@@ -154,6 +148,21 @@ namespace TeamBPathfinder
 		void UpdatePuzzleLabel()
 		{
 			labelPuzzle->Text = "Puzzle " + controller->getCurrentPuzzleNumber().ToString();
+		}
+
+		void AdvanceToNextPuzzle()
+		{
+			int nextIndex = controller->getCurrentPuzzleNumber();
+			if (nextIndex < controller->getPuzzleCount())
+			{
+				controller->startPuzzle(nextIndex);
+				RefreshGrid();
+				UpdatePuzzleLabel();
+			}
+			else
+			{
+				ShowMessage("You've completed all puzzles! Great job!", "Game Complete");
+			}
 		}
 
 		void HandleCellInput(int row, int col, String^ text)
@@ -201,14 +210,12 @@ namespace TeamBPathfinder
 			MessageBox::Show(message, title, MessageBoxButtons::OK, MessageBoxIcon::Information);
 		}
 
-	private:
 		System::Void resetButton_Click(System::Object^ sender, System::EventArgs^ e)
 		{
 			this->controller->resetCurrentPuzzle();
 			this->RefreshGrid();
 		}
 
-	private:
 		System::Void submitButton_Click(System::Object^ sender, System::EventArgs^ e)
 		{
 			MoveResult result = this->controller->submitPuzzle();
@@ -216,6 +223,7 @@ namespace TeamBPathfinder
 			if (result == MoveResult::PuzzleSolved)
 			{
 				ShowMessage("Congratulations! You solved the puzzle!", "Puzzle Complete");
+				AdvanceToNextPuzzle();
 			}
 			else if (result == MoveResult::PuzzleIncorrect)
 			{
@@ -225,6 +233,12 @@ namespace TeamBPathfinder
 			{
 				ShowMessage("Please fill in the whole board before submitting.", "Incomplete Puzzle");
 			}
+		}
+
+		System::Void OnDebugSolveClicked(System::Object^ sender, System::EventArgs^ e)
+		{
+			this->controller->solveCurrentPuzzle();
+			this->RefreshGrid();
 		}
 	};
 }

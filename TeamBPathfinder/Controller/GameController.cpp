@@ -7,6 +7,22 @@ GameController::GameController(GameEngine* engine, PuzzleRepository* repository)
     this->currentPuzzleIndex = 0;
 }
 
+void GameController::solveCurrentPuzzle()
+{
+    Puzzle puzzle = repository->getPuzzle(currentPuzzleIndex);
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            if (!engine->isFixed(row, col))
+            {
+                engine->removeNumber(row, col);
+                engine->placeNumber(row, col, puzzle.getSolutionValue(row, col));
+            }
+        }
+    }
+}
+
 void GameController::startPuzzle(int index)
 {
     currentPuzzleIndex = index;

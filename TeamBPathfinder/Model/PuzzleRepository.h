@@ -9,6 +9,7 @@ private:
     std::vector<Puzzle> puzzles;
 
     void buildPuzzleA();
+    void buildPuzzleB();
 
 public:
     PuzzleRepository();

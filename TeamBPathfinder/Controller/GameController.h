@@ -22,6 +22,7 @@ private:
 
 public:
     GameController(GameEngine* engine, PuzzleRepository* repository);
+    void solveCurrentPuzzle();
 
     void startPuzzle(int index);
     void resetCurrentPuzzle();
