@@ -17,12 +17,15 @@ namespace TeamBPathfinder {
 	public:
 		static const int BOARD_SIZE = 8;
 		static const int CELL_SIZE = 55;
+		static const int TEXTBOX_HEIGHT = 26;
 
 		event CellInputHandler^ OnCellInput;
 
 		GridPanel()
 		{
-			cells = gcnew array<TextBox^, 2>(BOARD_SIZE, BOARD_SIZE);
+			cellPanels = gcnew array<Panel^, 2>(BOARD_SIZE, BOARD_SIZE);
+			cellTextBoxes = gcnew array<TextBox^, 2>(BOARD_SIZE, BOARD_SIZE);
+
 			this->Size = Drawing::Size(
 				BOARD_SIZE * CELL_SIZE + 2,
 				BOARD_SIZE * CELL_SIZE + 2
@@ -33,47 +36,54 @@ namespace TeamBPathfinder {
 
 		void UpdateCell(int row, int col, int value, bool isFixed)
 		{
-			TextBox^ cell = cells[row, col];
+			Panel^ panel = cellPanels[row, col];
+			TextBox^ textBox = cellTextBoxes[row, col];
 
 			if (value > 0)
-				cell->Text = value.ToString();
+				textBox->Text = value.ToString();
 			else
-				cell->Text = "";
+				textBox->Text = "";
 
 			if (isFixed)
 			{
-				cell->ReadOnly = true;
-				cell->BackColor = Color::FromArgb(220, 220, 220);
-				cell->ForeColor = Color::FromArgb(40, 40, 40);
-				cell->Font = (gcnew Drawing::Font(L"Segoe UI", 13, FontStyle::Bold));
+				textBox->ReadOnly = true;
+				panel->BackColor = Color::FromArgb(220, 220, 220);
+				textBox->BackColor = Color::FromArgb(220, 220, 220);
+				textBox->ForeColor = Color::FromArgb(40, 40, 40);
+				textBox->Font = (gcnew Drawing::Font(L"Segoe UI", 13, FontStyle::Bold));
 			}
 			else
 			{
-				cell->ReadOnly = false;
-				cell->BackColor = Color::White;
-				cell->ForeColor = Color::FromArgb(60, 60, 60);
-				cell->Font = (gcnew Drawing::Font(L"Segoe UI", 13));
+				textBox->ReadOnly = false;
+				panel->BackColor = Color::White;
+				textBox->BackColor = Color::White;
+				textBox->ForeColor = Color::FromArgb(60, 60, 60);
+				textBox->Font = (gcnew Drawing::Font(L"Segoe UI", 13));
 			}
 		}
 
 		void ClearCell(int row, int col)
 		{
-			cells[row, col]->Text = "";
-			cells[row, col]->BackColor = Color::White;
+			cellTextBoxes[row, col]->Text = "";
+			cellPanels[row, col]->BackColor = Color::White;
+			cellTextBoxes[row, col]->BackColor = Color::White;
 		}
 
 		void HighlightCellError(int row, int col)
 		{
-			cells[row, col]->BackColor = Color::FromArgb(255, 200, 200);
+			cellPanels[row, col]->BackColor = Color::FromArgb(255, 200, 200);
+			cellTextBoxes[row, col]->BackColor = Color::FromArgb(255, 200, 200);
 		}
 
 		void ResetCellColor(int row, int col)
 		{
-			cells[row, col]->BackColor = Color::White;
+			cellPanels[row, col]->BackColor = Color::White;
+			cellTextBoxes[row, col]->BackColor = Color::White;
 		}
 
 	private:
-		array<TextBox^, 2>^ cells;
+		array<Panel^, 2>^ cellPanels;
+		array<TextBox^, 2>^ cellTextBoxes;
 
 		void BuildCells()
 		{
@@ -84,19 +94,38 @@ namespace TeamBPathfinder {
 
 		void AddCell(int row, int col)
 		{
-			TextBox^ cell = gcnew TextBox();
-			cell->Size = Drawing::Size(CELL_SIZE, CELL_SIZE);
-			cell->Location = Point(col * CELL_SIZE, row * CELL_SIZE);
-			cell->Multiline = true;
-			cell->TextAlign = HorizontalAlignment::Center;
-			cell->MaxLength = 2;
-			cell->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			cell->Font = (gcnew Drawing::Font(L"Segoe UI", 13));
-			cell->Tag = gcnew Point(row, col);
-			cell->Leave += gcnew EventHandler(this, &GridPanel::Cell_Leave);
+			Panel^ panel = gcnew Panel();
+			panel->Size = Drawing::Size(CELL_SIZE, CELL_SIZE);
+			panel->Location = Point(col * CELL_SIZE, row * CELL_SIZE);
+			panel->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			panel->BackColor = Color::White;
+			panel->Tag = gcnew Point(row, col);
+			panel->Click += gcnew EventHandler(this, &GridPanel::Panel_Click);
 
-			cells[row, col] = cell;
-			this->Controls->Add(cell);
+			TextBox^ textBox = gcnew TextBox();
+			textBox->Size = Drawing::Size(CELL_SIZE - 6, TEXTBOX_HEIGHT);
+			textBox->Location = Point(2, (CELL_SIZE - TEXTBOX_HEIGHT) / 2);
+			textBox->TextAlign = HorizontalAlignment::Center;
+			textBox->MaxLength = 2;
+			textBox->BorderStyle = System::Windows::Forms::BorderStyle::None;
+			textBox->Font = (gcnew Drawing::Font(L"Segoe UI", 13));
+			textBox->Tag = gcnew Point(row, col);
+			textBox->Leave += gcnew EventHandler(this, &GridPanel::Cell_Leave);
+
+			panel->Controls->Add(textBox);
+
+			cellPanels[row, col] = panel;
+			cellTextBoxes[row, col] = textBox;
+			this->Controls->Add(panel);
+		}
+
+		void Panel_Click(Object^ sender, EventArgs^ e)
+		{
+			Panel^ panel = safe_cast<Panel^>(sender);
+			Point^ position = safe_cast<Point^>(panel->Tag);
+			TextBox^ textBox = cellTextBoxes[position->X, position->Y];
+			if (!textBox->ReadOnly)
+				textBox->Focus();
 		}
 
 		void Cell_Leave(Object^ sender, EventArgs^ e)
