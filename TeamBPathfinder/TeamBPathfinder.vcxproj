@@ -124,6 +124,8 @@
     <ClCompile Include="Engine\GameEngine.cpp" />
     <ClCompile Include="Model\Puzzle.cpp" />
     <ClCompile Include="Model\PuzzleRepository.cpp" />
+    <ClCompile Include="Persistence\PuzzleFileHandler.cpp" />
+    <ClCompile Include="Utils\PathHelper.cpp" />
     <ClCompile Include="View\MainForm.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -131,15 +133,17 @@
     <ClInclude Include="Engine\GameEngine.h" />
     <ClInclude Include="Model\Puzzle.h" />
     <ClInclude Include="Model\PuzzleRepository.h" />
+    <ClInclude Include="Persistence\PuzzleFileHandler.h" />
+    <ClInclude Include="Utils\PathHelper.h" />
     <ClInclude Include="View\GridPanel.h" />
-	  <ClInclude Include="View\MainForm.h">
-		  <FileType>CppForm</FileType>
-	  </ClInclude>
+    <ClInclude Include="View\MainForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-	  <EmbeddedResource Include="View\MainForm.resx">
-		  <DependentUpon>MainForm.h</DependentUpon>
-	  </EmbeddedResource>
+    <EmbeddedResource Include="View\MainForm.resx">
+      <DependentUpon>MainForm.h</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

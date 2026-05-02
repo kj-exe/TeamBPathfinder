@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Model">
       <UniqueIdentifier>{271d997a-677f-440f-847f-064eaab6f263}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Persistence">
+      <UniqueIdentifier>{08a249d5-9df0-49f8-b5cf-740a2acc8f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{9d7d1df9-2088-4c11-ac11-5d8e7d7a6fe4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="View\MainForm.cpp">
@@ -41,6 +47,12 @@
     </ClCompile>
     <ClCompile Include="Model\PuzzleRepository.cpp">
       <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Persistence\PuzzleFileHandler.cpp">
+      <Filter>Source Files\Persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\PathHelper.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +72,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Model\PuzzleRepository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Persistence\PuzzleFileHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\PathHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
