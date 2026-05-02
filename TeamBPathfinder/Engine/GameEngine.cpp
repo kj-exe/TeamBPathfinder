@@ -35,12 +35,12 @@ void GameEngine::setFixed(int row, int col, int value)
 	fixed[row][col] = true;
 }
 
-int GameEngine::getValue(int row, int col)
+int GameEngine::getValue(int row, int col) const
 {
 	return board[row][col];
 }
 
-bool GameEngine::isFixed(int row, int col)
+bool GameEngine::isFixed(int row, int col) const
 {
 	return fixed[row][col];
 }
@@ -112,4 +112,12 @@ bool GameEngine::isSolutionCorrect()
 			return false;
 	}
 	return true;
+}
+
+void GameEngine::setEditableValue(int row, int col, int value)
+{
+	if (!fixed[row][col])
+	{
+		board[row][col] = value;
+	}
 }

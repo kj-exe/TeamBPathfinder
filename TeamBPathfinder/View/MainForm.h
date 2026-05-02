@@ -5,6 +5,7 @@
 #include "../Model/PuzzleRepository.h"
 #include "../Controller/GameController.h"
 #include "../Utils/PathHelper.h"
+#include "../Persistence/GameStateFileHandler.h"
 #pragma managed(pop)
 
 #include "GridPanel.h"
@@ -47,12 +48,31 @@ namespace TeamBPathfinder
 
 			SetUpUI();
 			SetupGrid();
-			controller->startPuzzle(0);
+
+			std::string savePath = Utils::PathHelper::getSaveFilePath();
+			if (!GameStateFileHandler::loadGameState(savePath, *controller))
+			{
+				controller->initializeFirstPuzzle();
+			}
+
 			RefreshGrid();
 			UpdatePuzzleLabel();
 		}
 
 	protected:
+		virtual void OnFormClosing(FormClosingEventArgs^ e) override
+		{
+			this->ActiveControl = nullptr;
+
+			if (controller != nullptr)
+			{
+				std::string savePath = Utils::PathHelper::getSaveFilePath();
+				GameStateFileHandler::saveGameState(savePath, *controller);
+			}
+
+			Form::OnFormClosing(e);
+		}
+
 		~MainForm()
 		{
 			if (components)
@@ -66,6 +86,7 @@ namespace TeamBPathfinder
 
 			if (gameEngine)
 				delete gameEngine;
+
 		}
 
 	private:

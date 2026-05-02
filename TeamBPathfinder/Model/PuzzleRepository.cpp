@@ -5,7 +5,7 @@
 
 PuzzleRepository::PuzzleRepository(const std::string& puzzleFilePath)
 {
-	this->puzzles = PuzzleFileLoader::loadPuzzles(puzzleFilePath);
+	this->puzzles = PuzzleFileHandler::loadPuzzles(puzzleFilePath);
 
 	if (this->puzzles.empty())
 	{

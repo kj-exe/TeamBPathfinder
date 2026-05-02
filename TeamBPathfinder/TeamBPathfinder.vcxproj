@@ -124,6 +124,7 @@
     <ClCompile Include="Engine\GameEngine.cpp" />
     <ClCompile Include="Model\Puzzle.cpp" />
     <ClCompile Include="Model\PuzzleRepository.cpp" />
+    <ClCompile Include="Persistence\GameStateFileHandler.cpp" />
     <ClCompile Include="Persistence\PuzzleFileHandler.cpp" />
     <ClCompile Include="Utils\PathHelper.cpp" />
     <ClCompile Include="View\MainForm.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="Engine\GameEngine.h" />
     <ClInclude Include="Model\Puzzle.h" />
     <ClInclude Include="Model\PuzzleRepository.h" />
+    <ClInclude Include="Persistence\GameStateFileHandler.h" />
     <ClInclude Include="Persistence\PuzzleFileHandler.h" />
     <ClInclude Include="Utils\PathHelper.h" />
     <ClInclude Include="View\GridPanel.h" />

@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-std::vector<Puzzle> PuzzleFileLoader::loadPuzzles(const std::string& filePath)
+std::vector<Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
 {
 	std::ifstream file(filePath);
 
@@ -73,7 +73,7 @@ std::vector<Puzzle> PuzzleFileLoader::loadPuzzles(const std::string& filePath)
 	return puzzles;
 }
 
-void PuzzleFileLoader::readClueLine(Puzzle& puzzle, const std::string& line)
+void PuzzleFileHandler::readClueLine(Puzzle& puzzle, const std::string& line)
 {
 	std::stringstream ss(line);
 
@@ -86,7 +86,7 @@ void PuzzleFileLoader::readClueLine(Puzzle& puzzle, const std::string& line)
 	puzzle.addClue(row, col, value);
 }
 
-void PuzzleFileLoader::readSolutionRow(Puzzle& puzzle, const std::string& line, int row)
+void PuzzleFileHandler::readSolutionRow(Puzzle& puzzle, const std::string& line, int row)
 {
 	std::stringstream ss(line);
 

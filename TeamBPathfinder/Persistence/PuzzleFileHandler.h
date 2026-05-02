@@ -6,7 +6,7 @@
 #include "../Model/Puzzle.h"
 
 
-class PuzzleFileLoader
+class PuzzleFileHandler
 
 {
 public:

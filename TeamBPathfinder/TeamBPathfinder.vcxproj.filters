@@ -54,6 +54,9 @@
     <ClCompile Include="Utils\PathHelper.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Persistence\GameStateFileHandler.cpp">
+      <Filter>Source Files\Persistence</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controller\GameController.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utils\PathHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Persistence\GameStateFileHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

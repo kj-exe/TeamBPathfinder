@@ -8,5 +8,7 @@ namespace Utils
 	{
 	public:
 		static std::string getPuzzleFilePath();
+
+		static std::string getSaveFilePath();
 	};
 }
