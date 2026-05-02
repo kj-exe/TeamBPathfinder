@@ -98,4 +98,7 @@
       <Filter>Source Files\View</Filter>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="puzzles.txt" />
+  </ItemGroup>
 </Project>

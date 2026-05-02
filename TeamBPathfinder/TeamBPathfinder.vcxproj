@@ -147,6 +147,11 @@
       <DependentUpon>MainForm.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="puzzles.txt">
+      <DeploymentContent>true</DeploymentContent>
+    </CopyFileToFolders>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
