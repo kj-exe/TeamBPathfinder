@@ -3,11 +3,11 @@
 #pragma managed(push, off)
 #include "../Engine/GameEngine.h"
 #include "../Model/PuzzleRepository.h"
-#include "../Model/GameSnapshot.h"
 #include "../Controller/GameController.h"
 #include "../Utils/PathHelper.h"
 #include "../Persistence/GameStateFileHandler.h"
 #pragma managed(pop)
+#include "../Model/GameSnapshot.h"
 
 #include "GridPanel.h"
 
@@ -31,6 +31,7 @@ namespace TeamBPathfinder
 			{
 				std::string puzzlePath = Utils::PathHelper::getPuzzleFilePath();
 				repository = new PuzzleRepository(puzzlePath);
+
 			}
 			catch (const std::exception& ex)
 			{
@@ -40,6 +41,7 @@ namespace TeamBPathfinder
 					MessageBoxButtons::OK,
 					MessageBoxIcon::Error
 				);
+
 				throw;
 			}
 
@@ -78,6 +80,7 @@ namespace TeamBPathfinder
 
 			if (gameEngine)
 				delete gameEngine;
+
 		}
 
 	private:
@@ -104,9 +107,9 @@ namespace TeamBPathfinder
 			this->SuspendLayout();
 
 			this->resetButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12,
-				System::Drawing::FontStyle::Regular,
-				System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(0)));
+			                                                       System::Drawing::FontStyle::Regular,
+			                                                       System::Drawing::GraphicsUnit::Point,
+			                                                       static_cast<System::Byte>(0)));
 			this->resetButton->Location = System::Drawing::Point(12, 501);
 			this->resetButton->Name = L"resetButton";
 			this->resetButton->Size = System::Drawing::Size(100, 40);
@@ -116,9 +119,9 @@ namespace TeamBPathfinder
 			this->resetButton->Click += gcnew System::EventHandler(this, &MainForm::resetButton_Click);
 
 			this->submitButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12,
-				System::Drawing::FontStyle::Regular,
-				System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(0)));
+			                                                        System::Drawing::FontStyle::Regular,
+			                                                        System::Drawing::GraphicsUnit::Point,
+			                                                        static_cast<System::Byte>(0)));
 			this->submitButton->Location = System::Drawing::Point(343, 501);
 			this->submitButton->Name = L"submitButton";
 			this->submitButton->Size = System::Drawing::Size(100, 40);
@@ -148,7 +151,11 @@ namespace TeamBPathfinder
 			this->labelPuzzle->Text = L"";
 
 			this->debugSolveButton = (gcnew Button());
-			this->debugSolveButton->Font = (gcnew Drawing::Font(L"Microsoft Sans Serif", 12, FontStyle::Regular));
+			this->debugSolveButton->Font = (gcnew Drawing::Font(
+				L"Microsoft Sans Serif",
+				12,
+				FontStyle::Regular
+			));
 			this->debugSolveButton->Text = L"Debug: Solve";
 			this->debugSolveButton->Size = Drawing::Size(120, 40);
 			this->debugSolveButton->Location = Point(GRID_MARGIN + 240, buttonRowY);
