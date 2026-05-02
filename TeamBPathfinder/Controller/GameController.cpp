@@ -17,6 +17,35 @@ GameController::GameController(GameEngine* engine, PuzzleRepository* repository)
     );
 }
 
+void GameController::startPuzzle(int index)
+{
+    saveCurrentBoardToMemory();
+    this->currentPuzzleIndex = index;
+
+    Puzzle puzzle = this->repository->getPuzzle(index);
+    this->engine->loadFromPuzzle(puzzle);
+
+    restoreBoardFromMemory(index);
+}
+
+void GameController::resetCurrentPuzzle()
+{
+    for (int row = 0; row < 8; row++)
+        for (int col = 0; col < 8; col++)
+            this->savedBoards[this->currentPuzzleIndex][row][col] = 0;
+
+    Puzzle puzzle = this->repository->getPuzzle(this->currentPuzzleIndex);
+    this->engine->loadFromPuzzle(puzzle);
+}
+
+void GameController::initializeFirstPuzzle()
+{
+    this->currentPuzzleIndex = 0;
+    Puzzle puzzle = this->repository->getPuzzle(0);
+    this->engine->loadFromPuzzle(puzzle);
+    restoreBoardFromMemory(0);
+}
+
 void GameController::solveCurrentPuzzle()
 {
     Puzzle puzzle = repository->getPuzzle(currentPuzzleIndex);
@@ -33,35 +62,14 @@ void GameController::solveCurrentPuzzle()
     }
 }
 
-void GameController::startPuzzle(int index)
-{
-    this->saveCurrentBoardToMemory();
-
-    this->currentPuzzleIndex = index;
-
-    Puzzle puzzle = this->repository->getPuzzle(index);
-    this->engine->loadFromPuzzle(puzzle);
-
-	this->restoreBoardFromMemory(index);
-}
-
-void GameController::resetCurrentPuzzle()
-{
-    for (int row = 0; row < 8; row++)
-    {
-        for (int col = 0; col < 8; col++)
-        {
-            this->savedBoards[this->currentPuzzleIndex][row][col] = 0;
-        }
-    }
-
-    Puzzle puzzle = this->repository->getPuzzle(this->currentPuzzleIndex);
-    this->engine->loadFromPuzzle(puzzle);
-}
-
 int GameController::getCurrentPuzzleNumber() const
 {
     return currentPuzzleIndex + 1;
+}
+
+int GameController::getCurrentPuzzleIndex() const
+{
+    return currentPuzzleIndex;
 }
 
 int GameController::getPuzzleCount() const
@@ -91,6 +99,15 @@ MoveResult GameController::clearCell(int row, int col)
     return MoveResult::Cleared;
 }
 
+MoveResult GameController::submitPuzzle()
+{
+    if (!engine->isBoardComplete())
+        return MoveResult::Incomplete;
+    if (engine->isSolutionCorrect())
+        return MoveResult::PuzzleSolved;
+    return MoveResult::PuzzleIncorrect;
+}
+
 int GameController::getValue(int row, int col) const
 {
     return engine->getValue(row, col);
@@ -101,38 +118,12 @@ bool GameController::isFixed(int row, int col) const
     return engine->isFixed(row, col);
 }
 
-MoveResult GameController::submitPuzzle()
-{
-    if (!engine->isBoardComplete())
-        return MoveResult::InvalidNumber;
-    if (engine->isSolutionCorrect())
-        return MoveResult::PuzzleSolved;
-    return MoveResult::PuzzleIncorrect;
-}
-
-int GameController::getCurrentPuzzleIndex() const
-{
-    return currentPuzzleIndex;
-}
-
-void GameController::restoreEditableValue(int row, int col, int value)
-{
-    if (!engine->isFixed(row, col))
-    {
-        engine->setEditableValue(row, col, value);
-    }
-}
-
 void GameController::saveCurrentBoardToMemory()
 {
     for (int row = 0; row < 8; row++)
-    {
         for (int col = 0; col < 8; col++)
-        {
             this->savedBoards[this->currentPuzzleIndex][row][col] =
-                this->engine->getValue(row, col);
-        }
-    }
+            this->engine->getValue(row, col);
 }
 
 void GameController::restoreBoardFromMemory(int puzzleIndex)
@@ -141,46 +132,47 @@ void GameController::restoreBoardFromMemory(int puzzleIndex)
     {
         for (int col = 0; col < 8; col++)
         {
-            this->restoreEditableValue(
-                row,
-                col,
-                this->savedBoards[puzzleIndex][row][col]
-            );
+            int value = this->savedBoards[puzzleIndex][row][col];
+            if (!engine->isFixed(row, col))
+                engine->setEditableValue(row, col, value);
         }
     }
 }
 
-int GameController::getSavedBoardValue(int puzzleIndex, int row, int col) const
+GameSnapshot GameController::getSnapshot()
 {
-    return this->savedBoards[puzzleIndex][row][col];
+    saveCurrentBoardToMemory();
+
+    int puzzleCount = (int)this->savedBoards.size();
+    GameSnapshot snapshot(puzzleCount);
+    snapshot.setCurrentPuzzleIndex(currentPuzzleIndex);
+
+    for (int puzzleIndex = 0; puzzleIndex < puzzleCount; puzzleIndex++)
+        for (int row = 0; row < 8; row++)
+            for (int col = 0; col < 8; col++)
+                snapshot.setValue(puzzleIndex, row, col, savedBoards[puzzleIndex][row][col]);
+
+    return snapshot;
 }
 
-void GameController::setSavedBoardValue(int puzzleIndex, int row, int col, int value)
+void GameController::loadFromSnapshot(const GameSnapshot& snapshot)
 {
-    this->savedBoards[puzzleIndex][row][col] = value;
-}
+    int puzzleCount = (int)this->savedBoards.size();
 
-int GameController::getSavedBoardCount() const
-{
-    return (int)this->savedBoards.size();
-}
+    if (snapshot.getBoardCount() != puzzleCount)
+        return;
 
-void GameController::loadPuzzleFromMemory(int index)
-{
-    this->currentPuzzleIndex = index;
+    for (int puzzleIndex = 0; puzzleIndex < puzzleCount; puzzleIndex++)
+        for (int row = 0; row < 8; row++)
+            for (int col = 0; col < 8; col++)
+                savedBoards[puzzleIndex][row][col] = snapshot.getValue(puzzleIndex, row, col);
 
-    Puzzle puzzle = this->repository->getPuzzle(index);
+    int targetIndex = snapshot.getCurrentPuzzleIndex();
+    if (targetIndex < 0 || targetIndex >= puzzleCount)
+        return;
+
+    this->currentPuzzleIndex = targetIndex;
+    Puzzle puzzle = this->repository->getPuzzle(targetIndex);
     this->engine->loadFromPuzzle(puzzle);
-
-    this->restoreBoardFromMemory(index);
-}
-
-void GameController::initializeFirstPuzzle()
-{
-    this->currentPuzzleIndex = 0;
-
-    Puzzle puzzle = this->repository->getPuzzle(0);
-    this->engine->loadFromPuzzle(puzzle);
-
-    this->restoreBoardFromMemory(0);
+    restoreBoardFromMemory(targetIndex);
 }

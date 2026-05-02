@@ -1,105 +1,85 @@
 #include "GameStateFileHandler.h"
 
-#include "../Controller/GameController.h"
-
 #include <fstream>
 #include <limits>
 
-bool GameStateFileHandler::saveGameState(const std::string& filePath, GameController& controller)
+bool GameStateFileHandler::saveGameState(const std::string& filePath, const GameSnapshot& snapshot)
 {
-	controller.saveCurrentBoardToMemory();
+    std::ofstream file(filePath);
 
-	std::ofstream file(filePath);
+    if (!file)
+        return false;
 
-	if (!file)
-	{
-		return false;
-	}
+    file << "CurrentPuzzleIndex: " << snapshot.getCurrentPuzzleIndex() << std::endl;
+    file << "PuzzleCount: " << snapshot.getBoardCount() << std::endl;
 
-	file << "CurrentPuzzleIndex: " << controller.getCurrentPuzzleIndex() << std::endl;
-	file << "PuzzleCount: " << controller.getSavedBoardCount() << std::endl;
+    for (int puzzleIndex = 0; puzzleIndex < snapshot.getBoardCount(); puzzleIndex++)
+    {
+        file << "PuzzleIndex: " << puzzleIndex << std::endl;
+        file << "Board:" << std::endl;
 
-	for (int puzzleIndex = 0; puzzleIndex < controller.getSavedBoardCount(); puzzleIndex++)
-	{
-		file << "PuzzleIndex: " << puzzleIndex << std::endl;
-		file << "Board:" << std::endl;
+        for (int row = 0; row < 8; row++)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                file << snapshot.getValue(puzzleIndex, row, col);
 
-		for (int row = 0; row < 8; row++)
-		{
-			for (int col = 0; col < 8; col++)
-			{
-				file << controller.getSavedBoardValue(puzzleIndex, row, col);
+                if (col < 7)
+                    file << " ";
+            }
+            file << std::endl;
+        }
+    }
 
-				if (col < 7)
-				{
-					file << " ";
-				}
-			}
-
-			file << std::endl;
-		}
-	}
-
-	return true;
+    return true;
 }
-bool GameStateFileHandler::loadGameState(const std::string& filePath, GameController& controller)
+
+bool GameStateFileHandler::loadGameState(const std::string& filePath, GameSnapshot& snapshot)
 {
-	std::ifstream file(filePath);
+    std::ifstream file(filePath);
 
-	if (!file)
-	{
-		return false;
-	}
+    if (!file)
+        return false;
 
+    std::string line;
 
-	std::string line;
+    std::getline(file, line);
+    int currentPuzzleIndex = std::stoi(line.substr(line.find(":") + 1));
 
-	std::getline(file, line);
-	int currentPuzzleIndex = std::stoi(line.substr(line.find(":") + 1));
+    std::getline(file, line);
+    int boardCount = std::stoi(line.substr(line.find(":") + 1));
 
-	std::getline(file, line);
-	int boardCount = std::stoi(line.substr(line.find(":") + 1));
+    if (boardCount != snapshot.getBoardCount())
+        return false;
 
-	if (currentPuzzleIndex < 0 || currentPuzzleIndex >= controller.getPuzzleCount())
-	{
-		return false;
-	}
+    if (currentPuzzleIndex < 0 || currentPuzzleIndex >= boardCount)
+        return false;
 
-	if (boardCount != controller.getSavedBoardCount())
-	{
-		return false;
-	}
+    snapshot.setCurrentPuzzleIndex(currentPuzzleIndex);
 
-	for (int i = 0; i < boardCount; i++)
-	{
-		std::getline(file, line);
-		int puzzleIndex = std::stoi(line.substr(line.find(":") + 1));
+    for (int i = 0; i < boardCount; i++)
+    {
+        std::getline(file, line);
+        int puzzleIndex = std::stoi(line.substr(line.find(":") + 1));
 
-		std::getline(file, line);
+        std::getline(file, line);
 
-		if (puzzleIndex < 0 || puzzleIndex >= controller.getSavedBoardCount())
-		{
-			return false;
-		}
+        if (puzzleIndex < 0 || puzzleIndex >= boardCount)
+            return false;
 
-		for (int row = 0; row < 8; row++)
-		{
-			for (int col = 0; col < 8; col++)
-			{
-				int value;
+        for (int row = 0; row < 8; row++)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                int value;
+                if (!(file >> value))
+                    return false;
 
-				if (!(file >> value))
-				{
-					return false;
-				}
+                snapshot.setValue(puzzleIndex, row, col, value);
+            }
+        }
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
 
-				controller.setSavedBoardValue(puzzleIndex, row, col, value);
-			}
-		}
-		file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	}
-
-	controller.loadPuzzleFromMemory(currentPuzzleIndex);
-
-	return true;
+    return true;
 }

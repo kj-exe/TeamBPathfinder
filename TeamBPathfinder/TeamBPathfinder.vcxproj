@@ -122,6 +122,7 @@
   <ItemGroup>
     <ClCompile Include="Controller\GameController.cpp" />
     <ClCompile Include="Engine\GameEngine.cpp" />
+    <ClCompile Include="GameSnapshot.cpp" />
     <ClCompile Include="Model\Puzzle.cpp" />
     <ClCompile Include="Model\PuzzleRepository.cpp" />
     <ClCompile Include="Persistence\GameStateFileHandler.cpp" />
@@ -132,6 +133,7 @@
   <ItemGroup>
     <ClInclude Include="Controller\GameController.h" />
     <ClInclude Include="Engine\GameEngine.h" />
+    <ClInclude Include="GameSnapshot.h" />
     <ClInclude Include="Model\Puzzle.h" />
     <ClInclude Include="Model\PuzzleRepository.h" />
     <ClInclude Include="Persistence\GameStateFileHandler.h" />

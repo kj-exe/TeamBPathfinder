@@ -2,7 +2,10 @@
 
 #include "../Engine/GameEngine.h"
 #include "../Model/PuzzleRepository.h"
+#include "../Model/GameSnapshot.h"
 #include <vector>
+
+class GameSnapshot;
 
 enum class MoveResult
 {
@@ -11,7 +14,8 @@ enum class MoveResult
     InvalidNumber,
     InvalidCell,
     PuzzleSolved,
-    PuzzleIncorrect
+    PuzzleIncorrect,
+    Incomplete
 };
 
 class GameController
@@ -22,13 +26,19 @@ private:
     int currentPuzzleIndex;
     std::vector<std::vector<std::vector<int>>> savedBoards;
 
+    void saveCurrentBoardToMemory();
+    void restoreBoardFromMemory(int puzzleIndex);
+
 public:
     GameController(GameEngine* engine, PuzzleRepository* repository);
-    void solveCurrentPuzzle();
 
     void startPuzzle(int index);
     void resetCurrentPuzzle();
+    void initializeFirstPuzzle();
+    void solveCurrentPuzzle();
+
     int getCurrentPuzzleNumber() const;
+    int getCurrentPuzzleIndex() const;
     int getPuzzleCount() const;
 
     MoveResult attemptMove(int row, int col, int value);
@@ -38,17 +48,6 @@ public:
     int getValue(int row, int col) const;
     bool isFixed(int row, int col) const;
 
-    int getCurrentPuzzleIndex() const;
-    void restoreEditableValue(int row, int col, int value);
-
-    void saveCurrentBoardToMemory();
-    void restoreBoardFromMemory(int puzzleIndex);
-
-    int getSavedBoardValue(int puzzleIndex, int row, int col) const;
-    void setSavedBoardValue(int puzzleIndex, int row, int col, int value);
-    int getSavedBoardCount() const;
-
-    void loadPuzzleFromMemory(int index);
-
-    void initializeFirstPuzzle();
+    GameSnapshot getSnapshot();
+    void loadFromSnapshot(const GameSnapshot& snapshot);
 };
