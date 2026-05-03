@@ -18,6 +18,7 @@ namespace TeamBPathfinder
 	using namespace System::ComponentModel;
 	using namespace System::Windows::Forms;
 	using namespace System::Drawing;
+	using namespace System::IO;
 
 	public ref class MainForm : public Form
 	{
@@ -44,10 +45,12 @@ namespace TeamBPathfinder
 			}
 
 			controller = new GameController(gameEngine, repository);
+			isPaused = false;
 
 			SetUpUI();
 			SetupGrid();
 			SetupTimer();
+			SetupMenuBar();
 
 			LoadSavedGame();
 
@@ -87,16 +90,21 @@ namespace TeamBPathfinder
 
 	private:
 		static const int GRID_MARGIN = 20;
-		static const int GRID_TOP = 50;
+		static const int GRID_TOP = 75;
+		static const int MENU_HEIGHT = 24;
 
 		Label^ labelPuzzle;
 		Label^ labelTimer;
+		Label^ pausedOverlay;
 		Button^ debugSolveButton;
+		MenuStrip^ menuStrip;
+		ToolStripMenuItem^ pauseMenuItem;
 		System::Windows::Forms::Timer^ gameTimer;
 		System::ComponentModel::Container^ components;
 		GameEngine* gameEngine;
 		PuzzleRepository* repository;
 		GameController* controller;
+		bool isPaused;
 
 		System::Windows::Forms::Button^ resetButton;
 		System::Windows::Forms::Button^ submitButton;
@@ -151,16 +159,31 @@ namespace TeamBPathfinder
 			this->labelPuzzle = (gcnew Label());
 			this->labelPuzzle->AutoSize = true;
 			this->labelPuzzle->Font = (gcnew Drawing::Font(L"Segoe UI", 14, FontStyle::Bold));
-			this->labelPuzzle->Location = Point(GRID_MARGIN, 12);
+			this->labelPuzzle->Location = Point(GRID_MARGIN, MENU_HEIGHT + 12);
 			this->labelPuzzle->Text = L"";
 
 			this->labelTimer = (gcnew Label());
 			this->labelTimer->AutoSize = false;
 			this->labelTimer->Font = (gcnew Drawing::Font(L"Segoe UI", 14, FontStyle::Bold));
 			this->labelTimer->Size = Drawing::Size(100, 28);
-			this->labelTimer->Location = Point(formWidth - 100 - GRID_MARGIN, 12);
+			this->labelTimer->Location = Point(formWidth - 100 - GRID_MARGIN, MENU_HEIGHT + 12);
 			this->labelTimer->TextAlign = ContentAlignment::MiddleRight;
 			this->labelTimer->Text = L"00:00";
+
+			this->pausedOverlay = (gcnew Label());
+			this->pausedOverlay->AutoSize = false;
+			this->pausedOverlay->Font = (gcnew Drawing::Font(L"Segoe UI", 36, FontStyle::Bold));
+			this->pausedOverlay->Size = Drawing::Size(
+				GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2,
+				GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2
+			);
+			this->pausedOverlay->Location = Point(GRID_MARGIN, GRID_TOP);
+			this->pausedOverlay->TextAlign = ContentAlignment::MiddleCenter;
+			this->pausedOverlay->Text = L"PAUSED";
+			this->pausedOverlay->BackColor = Color::FromArgb(240, 240, 240);
+			this->pausedOverlay->ForeColor = Color::FromArgb(80, 80, 80);
+			this->pausedOverlay->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->pausedOverlay->Visible = false;
 
 			this->debugSolveButton = (gcnew Button());
 			this->debugSolveButton->Font = (gcnew Drawing::Font(L"Microsoft Sans Serif", 12, FontStyle::Regular));
@@ -173,6 +196,7 @@ namespace TeamBPathfinder
 			this->ClientSize = Drawing::Size(formWidth, formHeight);
 			this->Controls->Add(this->labelPuzzle);
 			this->Controls->Add(this->labelTimer);
+			this->Controls->Add(this->pausedOverlay);
 			this->Text = L"Pathfinder 64 by Andrews & Miranda";
 
 			this->resetButton->Location = Point(GRID_MARGIN, buttonRowY);
@@ -192,6 +216,53 @@ namespace TeamBPathfinder
 			gameTimer = gcnew System::Windows::Forms::Timer();
 			gameTimer->Interval = 1000;
 			gameTimer->Tick += gcnew EventHandler(this, &MainForm::OnTimerTick);
+		}
+
+		void SetupMenuBar()
+		{
+			menuStrip = gcnew MenuStrip();
+
+			ToolStripMenuItem^ gameMenu = gcnew ToolStripMenuItem("Game");
+
+			ToolStripMenuItem^ newGame = gcnew ToolStripMenuItem("New Game");
+			newGame->Click += gcnew EventHandler(this, &MainForm::OnNewGameClicked);
+			gameMenu->DropDownItems->Add(newGame);
+
+			pauseMenuItem = gcnew ToolStripMenuItem("Pause");
+			pauseMenuItem->Click += gcnew EventHandler(this, &MainForm::OnPauseClicked);
+			gameMenu->DropDownItems->Add(pauseMenuItem);
+
+			gameMenu->DropDownItems->Add(gcnew ToolStripSeparator());
+
+			ToolStripMenuItem^ exit = gcnew ToolStripMenuItem("Exit");
+			exit->Click += gcnew EventHandler(this, &MainForm::OnExitClicked);
+			gameMenu->DropDownItems->Add(exit);
+
+			ToolStripMenuItem^ puzzleMenu = gcnew ToolStripMenuItem("Puzzle");
+			for (int i = 1; i <= controller->getPuzzleCount(); i++)
+			{
+				ToolStripMenuItem^ item = gcnew ToolStripMenuItem("Puzzle " + i.ToString());
+				item->Tag = i - 1;
+				item->Click += gcnew EventHandler(this, &MainForm::OnSelectPuzzleClicked);
+				puzzleMenu->DropDownItems->Add(item);
+			}
+
+			ToolStripMenuItem^ scoresMenu = gcnew ToolStripMenuItem("Scores");
+
+			ToolStripMenuItem^ viewScores = gcnew ToolStripMenuItem("View Scoreboard");
+			viewScores->Click += gcnew EventHandler(this, &MainForm::OnViewScoresClicked);
+			scoresMenu->DropDownItems->Add(viewScores);
+
+			ToolStripMenuItem^ resetScores = gcnew ToolStripMenuItem("Reset Scoreboard");
+			resetScores->Click += gcnew EventHandler(this, &MainForm::OnResetScoresClicked);
+			scoresMenu->DropDownItems->Add(resetScores);
+
+			menuStrip->Items->Add(gameMenu);
+			menuStrip->Items->Add(puzzleMenu);
+			menuStrip->Items->Add(scoresMenu);
+
+			this->MainMenuStrip = menuStrip;
+			this->Controls->Add(menuStrip);
 		}
 
 		void OnTimerTick(Object^ sender, EventArgs^ e)
@@ -256,6 +327,9 @@ namespace TeamBPathfinder
 
 		void HandleCellInput(int row, int col, String^ text)
 		{
+			if (isPaused)
+				return;
+
 			if (String::IsNullOrEmpty(text))
 			{
 				MoveResult result = controller->clearCell(row, col);
@@ -301,6 +375,9 @@ namespace TeamBPathfinder
 
 		System::Void resetButton_Click(System::Object^ sender, System::EventArgs^ e)
 		{
+			if (isPaused)
+				return;
+
 			this->controller->resetCurrentPuzzle();
 			this->RefreshGrid();
 			this->UpdateTimerLabel();
@@ -308,6 +385,9 @@ namespace TeamBPathfinder
 
 		System::Void submitButton_Click(System::Object^ sender, System::EventArgs^ e)
 		{
+			if (isPaused)
+				return;
+
 			MoveResult result = this->controller->submitPuzzle();
 
 			if (result == MoveResult::PuzzleSolved)
@@ -336,8 +416,94 @@ namespace TeamBPathfinder
 
 		System::Void OnDebugSolveClicked(System::Object^ sender, System::EventArgs^ e)
 		{
+			if (isPaused)
+				return;
+
 			this->controller->solveCurrentPuzzle();
 			this->RefreshGrid();
+		}
+
+		System::Void OnNewGameClicked(Object^ sender, EventArgs^ e)
+		{
+			System::Windows::Forms::DialogResult result = MessageBox::Show(
+				"Start a new game? This will erase all current progress.",
+				"Confirm New Game",
+				MessageBoxButtons::YesNo,
+				MessageBoxIcon::Warning
+			);
+
+			if (result != System::Windows::Forms::DialogResult::Yes)
+				return;
+
+			if (isPaused)
+				TogglePause();
+
+			std::string savePath = Utils::PathHelper::getSaveFilePath();
+			String^ managedPath = gcnew String(savePath.c_str());
+			if (File::Exists(managedPath))
+				File::Delete(managedPath);
+
+			delete controller;
+			controller = new GameController(gameEngine, repository);
+			controller->initializeFirstPuzzle();
+
+			RefreshGrid();
+			UpdatePuzzleLabel();
+			UpdateTimerLabel();
+		}
+
+		System::Void OnPauseClicked(Object^ sender, EventArgs^ e)
+		{
+			TogglePause();
+		}
+
+		void TogglePause()
+		{
+			isPaused = !isPaused;
+
+			if (isPaused)
+			{
+				gameTimer->Stop();
+				gridPanel->Visible = false;
+				pausedOverlay->Visible = true;
+				pauseMenuItem->Text = "Resume";
+			}
+			else
+			{
+				gameTimer->Start();
+				gridPanel->Visible = true;
+				pausedOverlay->Visible = false;
+				pauseMenuItem->Text = "Pause";
+			}
+		}
+
+		System::Void OnExitClicked(Object^ sender, EventArgs^ e)
+		{
+			this->Close();
+		}
+
+		System::Void OnSelectPuzzleClicked(Object^ sender, EventArgs^ e)
+		{
+			if (isPaused)
+				TogglePause();
+
+			ToolStripMenuItem^ item = safe_cast<ToolStripMenuItem^>(sender);
+			int targetIndex = safe_cast<int>(item->Tag);
+
+			controller->startPuzzle(targetIndex);
+			RefreshGrid();
+			UpdatePuzzleLabel();
+			UpdateTimerLabel();
+		}
+
+		System::Void OnViewScoresClicked(Object^ sender, EventArgs^ e)
+		{
+			ShowMessage("Scoreboard not implemented yet.", "Coming Soon");
+		}
+
+		System::Void OnResetScoresClicked(Object^ sender, EventArgs^ e)
+		{
+			ShowMessage("Scoreboard not implemented yet.", "Coming Soon");
 		}
 	};
 }

@@ -22,8 +22,8 @@ private:
     GameEngine* engine;
     PuzzleRepository* repository;
     int currentPuzzleIndex;
-    int elapsedSeconds;
     std::vector<std::vector<std::vector<int>>> savedBoards;
+    std::vector<int> savedSeconds;
 
     void saveCurrentBoardToMemory();
     void restoreBoardFromMemory(int puzzleIndex);

@@ -5,7 +5,6 @@ GameController::GameController(GameEngine* engine, PuzzleRepository* repository)
     this->engine = engine;
     this->repository = repository;
     this->currentPuzzleIndex = 0;
-    this->elapsedSeconds = 0;
 
     int puzzleCount = repository->getCount();
 
@@ -16,13 +15,14 @@ GameController::GameController(GameEngine* engine, PuzzleRepository* repository)
             std::vector<int>(8, 0)
         )
     );
+
+    this->savedSeconds.resize(puzzleCount, 0);
 }
 
 void GameController::startPuzzle(int index)
 {
     saveCurrentBoardToMemory();
     this->currentPuzzleIndex = index;
-    this->elapsedSeconds = 0;
 
     Puzzle puzzle = this->repository->getPuzzle(index);
     this->engine->loadFromPuzzle(puzzle);
@@ -32,7 +32,7 @@ void GameController::startPuzzle(int index)
 
 void GameController::resetCurrentPuzzle()
 {
-    this->elapsedSeconds = 0;
+    this->savedSeconds[this->currentPuzzleIndex] = 0;
 
     for (int row = 0; row < 8; row++)
         for (int col = 0; col < 8; col++)
@@ -45,7 +45,6 @@ void GameController::resetCurrentPuzzle()
 void GameController::initializeFirstPuzzle()
 {
     this->currentPuzzleIndex = 0;
-    this->elapsedSeconds = 0;
     Puzzle puzzle = this->repository->getPuzzle(0);
     this->engine->loadFromPuzzle(puzzle);
     restoreBoardFromMemory(0);
@@ -177,7 +176,6 @@ void GameController::loadFromSnapshot(const GameSnapshot& snapshot)
         return;
 
     this->currentPuzzleIndex = targetIndex;
-    this->elapsedSeconds = 0;
     Puzzle puzzle = this->repository->getPuzzle(targetIndex);
     this->engine->loadFromPuzzle(puzzle);
     restoreBoardFromMemory(targetIndex);
@@ -185,15 +183,15 @@ void GameController::loadFromSnapshot(const GameSnapshot& snapshot)
 
 void GameController::tick()
 {
-    elapsedSeconds++;
+    savedSeconds[currentPuzzleIndex]++;
 }
 
 void GameController::resetTimer()
 {
-    elapsedSeconds = 0;
+    savedSeconds[currentPuzzleIndex] = 0;
 }
 
 int GameController::getElapsedSeconds() const
 {
-    return elapsedSeconds;
+    return savedSeconds[currentPuzzleIndex];
 }
