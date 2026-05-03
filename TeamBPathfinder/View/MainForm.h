@@ -3,11 +3,11 @@
 #pragma managed(push, off)
 #include "../Engine/GameEngine.h"
 #include "../Model/PuzzleRepository.h"
+#include "../Model/GameSnapshot.h"
 #include "../Controller/GameController.h"
 #include "../Utils/PathHelper.h"
 #include "../Persistence/GameStateFileHandler.h"
 #pragma managed(pop)
-#include "../Model/GameSnapshot.h"
 
 #include "GridPanel.h"
 
@@ -31,7 +31,6 @@ namespace TeamBPathfinder
 			{
 				std::string puzzlePath = Utils::PathHelper::getPuzzleFilePath();
 				repository = new PuzzleRepository(puzzlePath);
-
 			}
 			catch (const std::exception& ex)
 			{
@@ -41,7 +40,6 @@ namespace TeamBPathfinder
 					MessageBoxButtons::OK,
 					MessageBoxIcon::Error
 				);
-
 				throw;
 			}
 
@@ -49,17 +47,22 @@ namespace TeamBPathfinder
 
 			SetUpUI();
 			SetupGrid();
+			SetupTimer();
 
 			LoadSavedGame();
 
 			RefreshGrid();
 			UpdatePuzzleLabel();
+			UpdateTimerLabel();
+			gameTimer->Start();
 		}
 
 	protected:
 		virtual void OnFormClosing(FormClosingEventArgs^ e) override
 		{
 			this->ActiveControl = nullptr;
+
+			gameTimer->Stop();
 
 			if (controller != nullptr)
 				SaveCurrentGame();
@@ -80,7 +83,6 @@ namespace TeamBPathfinder
 
 			if (gameEngine)
 				delete gameEngine;
-
 		}
 
 	private:
@@ -88,7 +90,9 @@ namespace TeamBPathfinder
 		static const int GRID_TOP = 50;
 
 		Label^ labelPuzzle;
+		Label^ labelTimer;
 		Button^ debugSolveButton;
+		System::Windows::Forms::Timer^ gameTimer;
 		System::ComponentModel::Container^ components;
 		GameEngine* gameEngine;
 		PuzzleRepository* repository;
@@ -107,9 +111,9 @@ namespace TeamBPathfinder
 			this->SuspendLayout();
 
 			this->resetButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12,
-			                                                       System::Drawing::FontStyle::Regular,
-			                                                       System::Drawing::GraphicsUnit::Point,
-			                                                       static_cast<System::Byte>(0)));
+				System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
 			this->resetButton->Location = System::Drawing::Point(12, 501);
 			this->resetButton->Name = L"resetButton";
 			this->resetButton->Size = System::Drawing::Size(100, 40);
@@ -119,9 +123,9 @@ namespace TeamBPathfinder
 			this->resetButton->Click += gcnew System::EventHandler(this, &MainForm::resetButton_Click);
 
 			this->submitButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12,
-			                                                        System::Drawing::FontStyle::Regular,
-			                                                        System::Drawing::GraphicsUnit::Point,
-			                                                        static_cast<System::Byte>(0)));
+				System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
 			this->submitButton->Location = System::Drawing::Point(343, 501);
 			this->submitButton->Name = L"submitButton";
 			this->submitButton->Size = System::Drawing::Size(100, 40);
@@ -150,12 +154,16 @@ namespace TeamBPathfinder
 			this->labelPuzzle->Location = Point(GRID_MARGIN, 12);
 			this->labelPuzzle->Text = L"";
 
+			this->labelTimer = (gcnew Label());
+			this->labelTimer->AutoSize = false;
+			this->labelTimer->Font = (gcnew Drawing::Font(L"Segoe UI", 14, FontStyle::Bold));
+			this->labelTimer->Size = Drawing::Size(100, 28);
+			this->labelTimer->Location = Point(formWidth - 100 - GRID_MARGIN, 12);
+			this->labelTimer->TextAlign = ContentAlignment::MiddleRight;
+			this->labelTimer->Text = L"00:00";
+
 			this->debugSolveButton = (gcnew Button());
-			this->debugSolveButton->Font = (gcnew Drawing::Font(
-				L"Microsoft Sans Serif",
-				12,
-				FontStyle::Regular
-			));
+			this->debugSolveButton->Font = (gcnew Drawing::Font(L"Microsoft Sans Serif", 12, FontStyle::Regular));
 			this->debugSolveButton->Text = L"Debug: Solve";
 			this->debugSolveButton->Size = Drawing::Size(120, 40);
 			this->debugSolveButton->Location = Point(GRID_MARGIN + 240, buttonRowY);
@@ -164,6 +172,7 @@ namespace TeamBPathfinder
 
 			this->ClientSize = Drawing::Size(formWidth, formHeight);
 			this->Controls->Add(this->labelPuzzle);
+			this->Controls->Add(this->labelTimer);
 			this->Text = L"Pathfinder 64 by Andrews & Miranda";
 
 			this->resetButton->Location = Point(GRID_MARGIN, buttonRowY);
@@ -176,6 +185,27 @@ namespace TeamBPathfinder
 			gridPanel->Location = Point(GRID_MARGIN, GRID_TOP);
 			gridPanel->OnCellInput += gcnew CellInputHandler(this, &MainForm::HandleCellInput);
 			this->Controls->Add(gridPanel);
+		}
+
+		void SetupTimer()
+		{
+			gameTimer = gcnew System::Windows::Forms::Timer();
+			gameTimer->Interval = 1000;
+			gameTimer->Tick += gcnew EventHandler(this, &MainForm::OnTimerTick);
+		}
+
+		void OnTimerTick(Object^ sender, EventArgs^ e)
+		{
+			controller->tick();
+			UpdateTimerLabel();
+		}
+
+		void UpdateTimerLabel()
+		{
+			int seconds = controller->getElapsedSeconds();
+			int minutes = seconds / 60;
+			int remaining = seconds % 60;
+			labelTimer->Text = String::Format("{0:00}:{1:00}", minutes, remaining);
 		}
 
 		void LoadSavedGame()
@@ -216,6 +246,7 @@ namespace TeamBPathfinder
 				controller->startPuzzle(nextIndex);
 				RefreshGrid();
 				UpdatePuzzleLabel();
+				UpdateTimerLabel();
 			}
 			else
 			{
@@ -272,6 +303,7 @@ namespace TeamBPathfinder
 		{
 			this->controller->resetCurrentPuzzle();
 			this->RefreshGrid();
+			this->UpdateTimerLabel();
 		}
 
 		System::Void submitButton_Click(System::Object^ sender, System::EventArgs^ e)
@@ -280,8 +312,17 @@ namespace TeamBPathfinder
 
 			if (result == MoveResult::PuzzleSolved)
 			{
-				ShowMessage("Congratulations! You solved the puzzle!", "Puzzle Complete");
+				gameTimer->Stop();
+				int finalSeconds = controller->getElapsedSeconds();
+				int finalMinutes = finalSeconds / 60;
+				int remainingSeconds = finalSeconds % 60;
+				ShowMessage(
+					"Congratulations! You solved the puzzle in " +
+					finalMinutes.ToString("00") + ":" + remainingSeconds.ToString("00") + "!",
+					"Puzzle Complete"
+				);
 				AdvanceToNextPuzzle();
+				gameTimer->Start();
 			}
 			else if (result == MoveResult::PuzzleIncorrect)
 			{

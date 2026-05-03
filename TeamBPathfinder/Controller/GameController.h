@@ -5,8 +5,6 @@
 #include "../Model/GameSnapshot.h"
 #include <vector>
 
-class GameSnapshot;
-
 enum class MoveResult
 {
     Accepted,
@@ -24,6 +22,7 @@ private:
     GameEngine* engine;
     PuzzleRepository* repository;
     int currentPuzzleIndex;
+    int elapsedSeconds;
     std::vector<std::vector<std::vector<int>>> savedBoards;
 
     void saveCurrentBoardToMemory();
@@ -50,4 +49,8 @@ public:
 
     GameSnapshot getSnapshot();
     void loadFromSnapshot(const GameSnapshot& snapshot);
+
+    void tick();
+    void resetTimer();
+    int getElapsedSeconds() const;
 };
