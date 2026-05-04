@@ -7,4 +7,4 @@ Player|3|2
 Player|5|2
 Player|6|2
 Player|7|2
-Player|10|3
+john|3|2
