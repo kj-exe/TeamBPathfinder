@@ -48,3 +48,28 @@ bool Scoreboard::isHighScore(int seconds) const
 
 	return seconds < this->scores.back().getSeconds();
 }
+
+std::vector<ScoreEntry> Scoreboard::getSortedScores(ScoreSortMode mode) const
+{
+	std::vector<ScoreEntry> sorted = this->scores;
+
+	std::sort(
+		sorted.begin(),
+		sorted.end(),
+		[mode](const ScoreEntry& a, const ScoreEntry& b)
+		{
+			if (mode == ScoreSortMode::PuzzleThenTime)
+			{
+				if (a.getPuzzleNumber() == b.getPuzzleNumber())
+				{
+					return a.getSeconds() < b.getSeconds();
+				}
+				return a.getPuzzleNumber() < b.getPuzzleNumber();
+			}
+
+			return a.getSeconds() < b.getSeconds();
+		}
+	);
+
+	return sorted;
+}
