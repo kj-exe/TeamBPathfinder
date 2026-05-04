@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Scoreboard& scoreboard)
+bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Model::Scoreboard& scoreboard)
 {
 	std::ofstream file(filePath);
 
@@ -24,7 +24,7 @@ bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Sc
 	return true;
 }
 
-bool ScoreboardFileHandler::loadScoreboard(const std::string& filePath, Scoreboard& scoreboard)
+bool ScoreboardFileHandler::loadScoreboard(const std::string& filePath, Model::Scoreboard& scoreboard)
 {
 	std::ifstream file(filePath);
 

@@ -51,4 +51,9 @@ namespace Constants
 	/// The number of seconds added to the timer per tick.
 	/// </summary>
 	static const int TIMER_INCREMENT_SECONDS = 1;
+
+	/// <summary>
+	/// The maximum number of score entries stored on the leaderboard.
+	/// </summary>
+	static const int MAX_SCORE_ENTRIES = 10;
 }
