@@ -12,9 +12,9 @@ bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Mo
 		return false;
 	}
 
-	const std::vector<ScoreEntry>& scores = scoreboard.getScores();
+	const std::vector<Model::ScoreEntry>& scores = scoreboard.getScores();
 
-	for (const ScoreEntry& entry : scores)
+	for (const Model::ScoreEntry& entry : scores)
 	{
 		file << entry.getPlayerName() << "|"
 			<< entry.getPuzzleNumber() << "|"
@@ -63,7 +63,7 @@ bool ScoreboardFileHandler::loadScoreboard(const std::string& filePath, Model::S
 		int puzzleNumber = std::stoi(puzzleText);
 		int seconds = std::stoi(secondsText);
 
-		scoreboard.addScore(ScoreEntry(name, puzzleNumber, seconds));
+		scoreboard.addScore(Model::ScoreEntry(name, puzzleNumber, seconds));
 	}
 
 	return true;
