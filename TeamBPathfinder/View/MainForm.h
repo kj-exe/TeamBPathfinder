@@ -267,6 +267,9 @@ namespace TeamBPathfinder
 
 		void OnTimerTick(Object^ sender, EventArgs^ e)
 		{
+			if (controller->isCurrentPuzzleSolved())
+				return;
+
 			controller->tick();
 			UpdateTimerLabel();
 		}
@@ -328,6 +331,9 @@ namespace TeamBPathfinder
 		void HandleCellInput(int row, int col, String^ text)
 		{
 			if (isPaused)
+				return;
+
+			if (controller->isCurrentPuzzleSolved())
 				return;
 
 			if (String::IsNullOrEmpty(text))
@@ -402,7 +408,8 @@ namespace TeamBPathfinder
 					"Puzzle Complete"
 				);
 				AdvanceToNextPuzzle();
-				gameTimer->Start();
+				if (!controller->isCurrentPuzzleSolved())
+					gameTimer->Start();
 			}
 			else if (result == MoveResult::PuzzleIncorrect)
 			{

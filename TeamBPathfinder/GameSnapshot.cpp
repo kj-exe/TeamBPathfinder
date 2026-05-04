@@ -15,6 +15,7 @@ GameSnapshot::GameSnapshot(int puzzleCount)
             std::vector<int>(8, 0)
         )
     );
+    this->solved.resize(puzzleCount, false);
 }
 
 int GameSnapshot::getCurrentPuzzleIndex() const
@@ -40,4 +41,14 @@ int GameSnapshot::getValue(int puzzleIndex, int row, int col) const
 void GameSnapshot::setValue(int puzzleIndex, int row, int col, int value)
 {
     this->boards[puzzleIndex][row][col] = value;
+}
+
+bool GameSnapshot::getSolved(int puzzleIndex) const
+{
+    return this->solved[puzzleIndex];
+}
+
+void GameSnapshot::setSolved(int puzzleIndex, bool isSolved)
+{
+    this->solved[puzzleIndex] = isSolved;
 }

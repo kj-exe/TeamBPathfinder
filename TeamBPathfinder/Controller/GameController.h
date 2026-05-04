@@ -24,6 +24,7 @@ private:
     int currentPuzzleIndex;
     std::vector<std::vector<std::vector<int>>> savedBoards;
     std::vector<int> savedSeconds;
+    std::vector<bool> solvedPuzzles;
 
     void saveCurrentBoardToMemory();
     void restoreBoardFromMemory(int puzzleIndex);
@@ -46,6 +47,7 @@ public:
 
     int getValue(int row, int col) const;
     bool isFixed(int row, int col) const;
+    bool isCurrentPuzzleSolved() const;
 
     GameSnapshot getSnapshot();
     void loadFromSnapshot(const GameSnapshot& snapshot);

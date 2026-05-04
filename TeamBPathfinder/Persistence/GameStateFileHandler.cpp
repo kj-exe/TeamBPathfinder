@@ -29,6 +29,8 @@ bool GameStateFileHandler::saveGameState(const std::string& filePath, const Game
             }
             file << std::endl;
         }
+        
+        file << "Solved: " << (snapshot.getSolved(puzzleIndex) ? 1 : 0) << std::endl;
     }
 
     return true;
@@ -79,6 +81,10 @@ bool GameStateFileHandler::loadGameState(const std::string& filePath, GameSnapsh
             }
         }
         file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        
+        std::getline(file, line);
+        int solvedFlag = std::stoi(line.substr(line.find(":") + 1));
+        snapshot.setSolved(puzzleIndex, solvedFlag == 1);
     }
 
     return true;

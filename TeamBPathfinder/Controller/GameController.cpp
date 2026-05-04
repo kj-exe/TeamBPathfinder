@@ -17,6 +17,7 @@ GameController::GameController(GameEngine* engine, PuzzleRepository* repository)
     );
 
     this->savedSeconds.resize(puzzleCount, 0);
+    this->solvedPuzzles.resize(puzzleCount, false);
 }
 
 void GameController::startPuzzle(int index)
@@ -33,6 +34,7 @@ void GameController::startPuzzle(int index)
 void GameController::resetCurrentPuzzle()
 {
     this->savedSeconds[this->currentPuzzleIndex] = 0;
+    this->solvedPuzzles[this->currentPuzzleIndex] = false;
 
     for (int row = 0; row < 8; row++)
         for (int col = 0; col < 8; col++)
@@ -108,7 +110,10 @@ MoveResult GameController::submitPuzzle()
     if (!engine->isBoardComplete())
         return MoveResult::Incomplete;
     if (engine->isSolutionCorrect())
+    {
+        solvedPuzzles[currentPuzzleIndex] = true;
         return MoveResult::PuzzleSolved;
+    }
     return MoveResult::PuzzleIncorrect;
 }
 
@@ -120,6 +125,11 @@ int GameController::getValue(int row, int col) const
 bool GameController::isFixed(int row, int col) const
 {
     return engine->isFixed(row, col);
+}
+
+bool GameController::isCurrentPuzzleSolved() const
+{
+    return solvedPuzzles[currentPuzzleIndex];
 }
 
 void GameController::saveCurrentBoardToMemory()
@@ -156,6 +166,9 @@ GameSnapshot GameController::getSnapshot()
             for (int col = 0; col < 8; col++)
                 snapshot.setValue(puzzleIndex, row, col, savedBoards[puzzleIndex][row][col]);
 
+    for (int puzzleIndex = 0; puzzleIndex < puzzleCount; puzzleIndex++)
+        snapshot.setSolved(puzzleIndex, solvedPuzzles[puzzleIndex]);
+
     return snapshot;
 }
 
@@ -170,6 +183,9 @@ void GameController::loadFromSnapshot(const GameSnapshot& snapshot)
         for (int row = 0; row < 8; row++)
             for (int col = 0; col < 8; col++)
                 savedBoards[puzzleIndex][row][col] = snapshot.getValue(puzzleIndex, row, col);
+
+    for (int puzzleIndex = 0; puzzleIndex < puzzleCount; puzzleIndex++)
+        solvedPuzzles[puzzleIndex] = snapshot.getSolved(puzzleIndex);
 
     int targetIndex = snapshot.getCurrentPuzzleIndex();
     if (targetIndex < 0 || targetIndex >= puzzleCount)
