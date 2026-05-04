@@ -57,6 +57,9 @@
     <ClCompile Include="Persistence\GameStateFileHandler.cpp">
       <Filter>Source Files\Persistence</Filter>
     </ClCompile>
+    <ClCompile Include="Model\GameSnapshot.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controller\GameController.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Persistence\GameStateFileHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\GameSnapshot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
