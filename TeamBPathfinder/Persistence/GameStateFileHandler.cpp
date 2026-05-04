@@ -31,6 +31,7 @@ bool GameStateFileHandler::saveGameState(const std::string& filePath, const Game
         }
         
         file << "Solved: " << (snapshot.getSolved(puzzleIndex) ? 1 : 0) << std::endl;
+        file << "Seconds: " << snapshot.getSeconds(puzzleIndex) << std::endl;
     }
 
     return true;
@@ -85,6 +86,10 @@ bool GameStateFileHandler::loadGameState(const std::string& filePath, GameSnapsh
         std::getline(file, line);
         int solvedFlag = std::stoi(line.substr(line.find(":") + 1));
         snapshot.setSolved(puzzleIndex, solvedFlag == 1);
+
+        std::getline(file, line);
+        int seconds = std::stoi(line.substr(line.find(":") + 1));
+        snapshot.setSeconds(puzzleIndex, seconds);
     }
 
     return true;
