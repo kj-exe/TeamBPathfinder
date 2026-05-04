@@ -3,7 +3,7 @@
 
 namespace Controller
 {
-	GameController::GameController(Engine::GameEngine* engine, PuzzleRepository* repository)
+	GameController::GameController(Engine::GameEngine* engine, Model::PuzzleRepository* repository)
 	{
 		this->engine = engine;
 		this->repository = repository;

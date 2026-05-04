@@ -28,7 +28,7 @@ namespace Controller
 	{
 	private:
 		Engine::GameEngine* engine;
-		PuzzleRepository* repository;
+		Model::PuzzleRepository* repository;
 		int currentPuzzleIndex;
 		std::vector<std::vector<std::vector<int>>> savedBoards;
 		std::vector<int> savedSeconds;
@@ -43,7 +43,7 @@ namespace Controller
 		/// </summary>
 		/// <param name="engine">The game engine used to manage the active board.</param>
 		/// <param name="repository">The repository used to retrieve puzzle definitions.</param>
-		GameController(Engine::GameEngine* engine, PuzzleRepository* repository);
+		GameController(Engine::GameEngine* engine, Model::PuzzleRepository* repository);
 
 		/// <summary>
 		/// Starts the puzzle at the specified index after saving the current puzzle state.
