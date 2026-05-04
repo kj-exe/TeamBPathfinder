@@ -60,6 +60,15 @@
     <ClCompile Include="Model\GameSnapshot.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Model\ScoreEntry.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Scoreboard.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Persistence\ScoreboardFileHandler.cpp">
+      <Filter>Source Files\Persistence</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controller\GameController.h">
@@ -92,6 +101,21 @@
     <ClInclude Include="Model\GameSnapshot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Model\ScoreEntry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Scoreboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Persistence\ScoreboardFileHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="View\ScoreboardForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="View\NameEntryForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="View\MainForm.resx">
@@ -106,5 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="puzzles.txt" />
+    <CopyFileToFolders Include="scores.txt" />
   </ItemGroup>
 </Project>

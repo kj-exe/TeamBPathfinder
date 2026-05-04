@@ -16,4 +16,18 @@ namespace Utils
 
 		return msclr::interop::marshal_as<std::string>(pathManaged);
 	}
+
+	std::string PathHelper::getScoreboardFilePath()
+	{
+		System::String^ basePath = System::Windows::Forms::Application::StartupPath;
+
+		System::String^ projectPath =
+			System::IO::Directory::GetParent(
+				System::IO::Directory::GetParent(basePath)->FullName
+			)->FullName;
+
+		System::String^ fullPath = projectPath + "\\TeamBPathfinder\\scores.txt";
+
+		return msclr::interop::marshal_as<std::string>(fullPath);
+	}
 }

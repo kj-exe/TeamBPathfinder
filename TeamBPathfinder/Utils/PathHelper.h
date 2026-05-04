@@ -10,5 +10,7 @@ namespace Utils
 		static std::string getPuzzleFilePath();
 
 		static std::string getSaveFilePath();
+
+		static std::string getScoreboardFilePath();
 	};
 }

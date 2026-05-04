@@ -125,8 +125,11 @@
     <ClCompile Include="Model\GameSnapshot.cpp" />
     <ClCompile Include="Model\Puzzle.cpp" />
     <ClCompile Include="Model\PuzzleRepository.cpp" />
+    <ClCompile Include="Model\Scoreboard.cpp" />
+    <ClCompile Include="Model\ScoreEntry.cpp" />
     <ClCompile Include="Persistence\GameStateFileHandler.cpp" />
     <ClCompile Include="Persistence\PuzzleFileHandler.cpp" />
+    <ClCompile Include="Persistence\ScoreboardFileHandler.cpp" />
     <ClCompile Include="Utils\PathHelper.cpp" />
     <ClCompile Include="View\MainForm.cpp" />
   </ItemGroup>
@@ -136,13 +139,18 @@
     <ClInclude Include="Model\GameSnapshot.h" />
     <ClInclude Include="Model\Puzzle.h" />
     <ClInclude Include="Model\PuzzleRepository.h" />
+    <ClInclude Include="Model\Scoreboard.h" />
+    <ClInclude Include="Model\ScoreEntry.h" />
     <ClInclude Include="Persistence\GameStateFileHandler.h" />
     <ClInclude Include="Persistence\PuzzleFileHandler.h" />
+    <ClInclude Include="Persistence\ScoreboardFileHandler.h" />
     <ClInclude Include="Utils\PathHelper.h" />
     <ClInclude Include="View\GridPanel.h" />
     <ClInclude Include="View\MainForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="View\NameEntryForm.h" />
+    <ClInclude Include="View\ScoreboardForm.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="View\MainForm.resx">
@@ -151,6 +159,11 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="puzzles.txt">
+      <DeploymentContent>true</DeploymentContent>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="scores.txt">
       <DeploymentContent>true</DeploymentContent>
     </CopyFileToFolders>
   </ItemGroup>

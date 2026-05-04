@@ -7,9 +7,17 @@
 #include "../Controller/GameController.h"
 #include "../Utils/PathHelper.h"
 #include "../Persistence/GameStateFileHandler.h"
+#include "../Model/Scoreboard.h"
+#include "../Model/ScoreEntry.h"
+#include "../Persistence/ScoreboardFileHandler.h"
 #pragma managed(pop)
 
 #include "GridPanel.h"
+#include "ScoreboardForm.h"
+#include "NameEntryForm.h"
+#include <msclr/marshal_cppstd.h>
+
+
 
 
 namespace TeamBPathfinder
@@ -46,6 +54,22 @@ namespace TeamBPathfinder
 
 			controller = new GameController(gameEngine, repository);
 			isPaused = false;
+			scoreboard = new Scoreboard();
+			try
+			{
+				std::string scorePath = Utils::PathHelper::getScoreboardFilePath();
+				ScoreboardFileHandler::loadScoreboard(scorePath, *scoreboard);
+			}
+			catch (const std::exception& ex)
+			{
+				MessageBox::Show(
+					gcnew String(ex.what()),
+					"Error Loading Scoreboard",
+					MessageBoxButtons::OK,
+					MessageBoxIcon::Error
+				);
+				throw;
+			}
 
 			SetUpUI();
 			SetupGrid();
@@ -86,6 +110,9 @@ namespace TeamBPathfinder
 
 			if (gameEngine)
 				delete gameEngine;
+
+			if (scoreboard)
+				delete scoreboard;
 		}
 
 	private:
@@ -105,6 +132,7 @@ namespace TeamBPathfinder
 		PuzzleRepository* repository;
 		GameController* controller;
 		bool isPaused;
+		Scoreboard* scoreboard;
 
 		System::Windows::Forms::Button^ resetButton;
 		System::Windows::Forms::Button^ submitButton;
@@ -387,6 +415,10 @@ namespace TeamBPathfinder
 			this->controller->resetCurrentPuzzle();
 			this->RefreshGrid();
 			this->UpdateTimerLabel();
+			if (!controller->isCurrentPuzzleSolved())
+			{
+				gameTimer->Start();
+			}
 		}
 
 		System::Void submitButton_Click(System::Object^ sender, System::EventArgs^ e)
@@ -399,6 +431,38 @@ namespace TeamBPathfinder
 			if (result == MoveResult::PuzzleSolved)
 			{
 				gameTimer->Stop();
+				int time = controller->getElapsedSeconds();
+
+				if (scoreboard->isHighScore(time))
+				{
+					NameEntryForm^ nameForm = gcnew NameEntryForm();
+
+					if (nameForm->ShowDialog() != System::Windows::Forms::DialogResult::OK)
+					{
+						return;
+					}
+
+					String^ name = nameForm->GetPlayerName();
+
+					if (String::IsNullOrWhiteSpace(name))
+					{
+						name = "Player";
+					}
+
+					std::string playerName = msclr::interop::marshal_as<std::string>(name);
+
+					ScoreEntry entry(
+						playerName,
+						controller->getCurrentPuzzleNumber(),
+						time
+					);
+
+					scoreboard->addScore(entry);
+
+					std::string scorePath = Utils::PathHelper::getScoreboardFilePath();
+					ScoreboardFileHandler::saveScoreboard(scorePath, *scoreboard);
+				}
+
 				int finalSeconds = controller->getElapsedSeconds();
 				int finalMinutes = finalSeconds / 60;
 				int remainingSeconds = finalSeconds % 60;
@@ -505,12 +569,34 @@ namespace TeamBPathfinder
 
 		System::Void OnViewScoresClicked(Object^ sender, EventArgs^ e)
 		{
-			ShowMessage("Scoreboard not implemented yet.", "Coming Soon");
+			if (scoreboard->getScores().empty())
+			{
+				ShowMessage("No scores yet.", "Scoreboard");
+				return;
+			}
+
+			ScoreboardForm^ form = gcnew ScoreboardForm(*scoreboard);
+			form->ShowDialog();
 		}
 
 		System::Void OnResetScoresClicked(Object^ sender, EventArgs^ e)
 		{
-			ShowMessage("Scoreboard not implemented yet.", "Coming Soon");
+			System::Windows::Forms::DialogResult result = MessageBox::Show(
+				"Are you sure you want to reset the scoreboard?",
+				"Confirm Reset",
+				MessageBoxButtons::YesNo,
+				MessageBoxIcon::Warning
+			);
+
+			if (result != System::Windows::Forms::DialogResult::Yes)
+				return;
+
+			scoreboard->clear();
+
+			std::string scorePath = Utils::PathHelper::getScoreboardFilePath();
+			ScoreboardFileHandler::saveScoreboard(scorePath, *scoreboard);
+
+			ShowMessage("Scoreboard has been reset.", "Reset Complete");
 		}
 	};
 }
