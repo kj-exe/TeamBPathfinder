@@ -3,6 +3,7 @@
 #include "../Engine/GameEngine.h"
 #include "../Model/PuzzleRepository.h"
 #include "../Model/GameSnapshot.h"
+#include "../Common/Constants.h"
 #include <vector>
 
 namespace Controller
@@ -27,7 +28,7 @@ namespace Controller
 	class GameController
 	{
 	private:
-		GameEngine* engine;
+		Engine::GameEngine* engine;
 		PuzzleRepository* repository;
 		int currentPuzzleIndex;
 		std::vector<std::vector<std::vector<int>>> savedBoards;
@@ -37,19 +38,13 @@ namespace Controller
 		void saveCurrentBoardToMemory();
 		void restoreBoardFromMemory(int puzzleIndex);
 
-		static const int BOARD_SIZE = 8;
-		static const int EMPTY_VALUE = 0;
-		static const int FIRST_PUZZLE_INDEX = 0;
-		static const int DISPLAY_NUMBER_OFFSET = 1;
-		static const int TIMER_INCREMENT_SECONDS = 1;
-
 	public:
 		/// <summary>
 		/// Initializes the game controller with a game engine and puzzle repository.
 		/// </summary>
 		/// <param name="engine">The game engine used to manage the active board.</param>
 		/// <param name="repository">The repository used to retrieve puzzle definitions.</param>
-		GameController(GameEngine* engine, PuzzleRepository* repository);
+		GameController(Engine::GameEngine* engine, PuzzleRepository* repository);
 
 		/// <summary>
 		/// Starts the puzzle at the specified index after saving the current puzzle state.

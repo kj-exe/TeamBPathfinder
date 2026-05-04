@@ -136,6 +136,7 @@
     <ClCompile Include="View\MainForm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\Constants.h" />
     <ClInclude Include="Controller\GameController.h" />
     <ClInclude Include="Engine\GameEngine.h" />
     <ClInclude Include="Model\GameSnapshot.h" />

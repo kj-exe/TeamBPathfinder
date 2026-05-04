@@ -2,19 +2,19 @@
 
 namespace Controller
 {
-	GameController::GameController(GameEngine* engine, PuzzleRepository* repository)
+	GameController::GameController(Engine::GameEngine* engine, PuzzleRepository* repository)
 	{
 		this->engine = engine;
 		this->repository = repository;
-		this->currentPuzzleIndex = FIRST_PUZZLE_INDEX;
+		this->currentPuzzleIndex = Constants::FIRST_PUZZLE_INDEX;
 
 		int puzzleCount = repository->getCount();
 
 		this->savedBoards.resize(
 			puzzleCount,
 			std::vector<std::vector<int>>(
-				BOARD_SIZE,
-				std::vector<int>(BOARD_SIZE, EMPTY_VALUE)
+				Constants::BOARD_ROW_SIZE,
+				std::vector<int>(Constants::BOARD_COLUMN_SIZE, Constants::EMPTY_VALUE)
 			)
 		);
 
@@ -38,11 +38,11 @@ namespace Controller
 		this->savedSeconds[this->currentPuzzleIndex] = 0;
 		this->solvedPuzzles[this->currentPuzzleIndex] = false;
 
-		for (int row = 0; row < BOARD_SIZE; row++)
+		for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
 		{
-			for (int col = 0; col < BOARD_SIZE; col++)
+			for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
 			{
-				this->savedBoards[this->currentPuzzleIndex][row][col] = EMPTY_VALUE;
+				this->savedBoards[this->currentPuzzleIndex][row][col] = Constants::EMPTY_VALUE;
 			}
 		}
 
@@ -52,21 +52,21 @@ namespace Controller
 
 	void GameController::initializeFirstPuzzle()
 	{
-		this->currentPuzzleIndex = FIRST_PUZZLE_INDEX;
+		this->currentPuzzleIndex = Constants::FIRST_PUZZLE_INDEX;
 
-		Puzzle puzzle = this->repository->getPuzzle(FIRST_PUZZLE_INDEX);
+		Puzzle puzzle = this->repository->getPuzzle(Constants::FIRST_PUZZLE_INDEX);
 		this->engine->loadFromPuzzle(puzzle);
 
-		this->restoreBoardFromMemory(FIRST_PUZZLE_INDEX);
+		this->restoreBoardFromMemory(Constants::FIRST_PUZZLE_INDEX);
 	}
 
 	void GameController::solveCurrentPuzzle()
 	{
 		Puzzle puzzle = this->repository->getPuzzle(this->currentPuzzleIndex);
 
-		for (int row = 0; row < BOARD_SIZE; row++)
+		for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
 		{
-			for (int col = 0; col < BOARD_SIZE; col++)
+			for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
 			{
 				if (!this->engine->isFixed(row, col))
 				{
@@ -81,7 +81,7 @@ namespace Controller
 
 	int GameController::getCurrentPuzzleNumber() const
 	{
-		return this->currentPuzzleIndex + DISPLAY_NUMBER_OFFSET;
+		return this->currentPuzzleIndex + Constants::DISPLAY_NUMBER_OFFSET;
 	}
 
 	int GameController::getCurrentPuzzleIndex() const
@@ -156,9 +156,9 @@ namespace Controller
 
 	void GameController::saveCurrentBoardToMemory()
 	{
-		for (int row = 0; row < BOARD_SIZE; row++)
+		for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
 		{
-			for (int col = 0; col < BOARD_SIZE; col++)
+			for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
 			{
 				this->savedBoards[this->currentPuzzleIndex][row][col] =
 					this->engine->getValue(row, col);
@@ -168,9 +168,9 @@ namespace Controller
 
 	void GameController::restoreBoardFromMemory(int puzzleIndex)
 	{
-		for (int row = 0; row < BOARD_SIZE; row++)
+		for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
 		{
-			for (int col = 0; col < BOARD_SIZE; col++)
+			for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
 			{
 				int value = this->savedBoards[puzzleIndex][row][col];
 
@@ -193,9 +193,9 @@ namespace Controller
 
 		for (int puzzleIndex = 0; puzzleIndex < puzzleCount; puzzleIndex++)
 		{
-			for (int row = 0; row < BOARD_SIZE; row++)
+			for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
 			{
-				for (int col = 0; col < BOARD_SIZE; col++)
+				for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
 				{
 					snapshot.setValue(
 						puzzleIndex,
@@ -224,9 +224,9 @@ namespace Controller
 
 		for (int puzzleIndex = 0; puzzleIndex < puzzleCount; puzzleIndex++)
 		{
-			for (int row = 0; row < BOARD_SIZE; row++)
+			for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
 			{
-				for (int col = 0; col < BOARD_SIZE; col++)
+				for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
 				{
 					this->savedBoards[puzzleIndex][row][col] =
 						snapshot.getValue(puzzleIndex, row, col);
@@ -256,7 +256,7 @@ namespace Controller
 	{
 		if (!this->solvedPuzzles[this->currentPuzzleIndex])
 		{
-			this->savedSeconds[this->currentPuzzleIndex] += TIMER_INCREMENT_SECONDS;
+			this->savedSeconds[this->currentPuzzleIndex] += Constants::TIMER_INCREMENT_SECONDS;
 		}
 	}
 

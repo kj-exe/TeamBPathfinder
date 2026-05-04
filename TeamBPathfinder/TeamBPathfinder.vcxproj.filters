@@ -69,6 +69,12 @@
     <ClCompile Include="Persistence\ScoreboardFileHandler.cpp">
       <Filter>Source Files\Persistence</Filter>
     </ClCompile>
+    <ClCompile Include="Persistence\SettingsFileHandler.cpp">
+      <Filter>Source Files\Persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\UserSettings.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controller\GameController.h">
@@ -114,6 +120,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="View\NameEntryForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\UserSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Persistence\SettingsFileHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="View\SettingsForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
