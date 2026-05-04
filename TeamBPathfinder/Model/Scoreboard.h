@@ -16,7 +16,6 @@ class Scoreboard
 private:
 	std::vector<ScoreEntry> scores;
 
-
 	void sortScores();
 
 	void trimToTopTen();
