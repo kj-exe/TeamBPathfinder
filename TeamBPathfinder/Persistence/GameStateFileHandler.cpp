@@ -3,7 +3,7 @@
 #include <fstream>
 #include <limits>
 
-bool GameStateFileHandler::saveGameState(const std::string& filePath, const GameSnapshot& snapshot)
+bool GameStateFileHandler::saveGameState(const std::string& filePath, const Model::GameSnapshot& snapshot)
 {
     std::ofstream file(filePath);
 
@@ -37,7 +37,7 @@ bool GameStateFileHandler::saveGameState(const std::string& filePath, const Game
     return true;
 }
 
-bool GameStateFileHandler::loadGameState(const std::string& filePath, GameSnapshot& snapshot)
+bool GameStateFileHandler::loadGameState(const std::string& filePath, Model::GameSnapshot& snapshot)
 {
     std::ifstream file(filePath);
 

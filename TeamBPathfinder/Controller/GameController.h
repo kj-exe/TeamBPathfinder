@@ -3,7 +3,6 @@
 #include "../Engine/GameEngine.h"
 #include "../Model/PuzzleRepository.h"
 #include "../Model/GameSnapshot.h"
-#include "../Common/Constants.h"
 #include <vector>
 
 namespace Controller
@@ -134,13 +133,13 @@ namespace Controller
 		/// Creates a snapshot of the current game state.
 		/// </summary>
 		/// <returns>A snapshot containing saved boards, solved statuses, timer values, and the current puzzle index.</returns>
-		GameSnapshot getSnapshot();
+		Model::GameSnapshot getSnapshot();
 
 		/// <summary>
 		/// Loads the game state from a snapshot.
 		/// </summary>
 		/// <param name="snapshot">The snapshot to load from.</param>
-		void loadFromSnapshot(const GameSnapshot& snapshot);
+		void loadFromSnapshot(const Model::GameSnapshot& snapshot);
 
 		/// <summary>
 		/// Advances the timer for the current puzzle by one second.

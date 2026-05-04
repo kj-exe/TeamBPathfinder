@@ -1,4 +1,5 @@
 #include "GameController.h"
+#include "../Common/Constants.h"
 
 namespace Controller
 {
@@ -182,12 +183,12 @@ namespace Controller
 		}
 	}
 
-	GameSnapshot GameController::getSnapshot()
+	Model::GameSnapshot GameController::getSnapshot()
 	{
 		this->saveCurrentBoardToMemory();
 
 		int puzzleCount = this->getPuzzleCount();
-		GameSnapshot snapshot(puzzleCount);
+		Model::GameSnapshot snapshot(puzzleCount);
 
 		snapshot.setCurrentPuzzleIndex(this->currentPuzzleIndex);
 
@@ -213,7 +214,7 @@ namespace Controller
 		return snapshot;
 	}
 
-	void GameController::loadFromSnapshot(const GameSnapshot& snapshot)
+	void GameController::loadFromSnapshot(const Model::GameSnapshot& snapshot)
 	{
 		int puzzleCount = this->getPuzzleCount();
 

@@ -21,6 +21,7 @@
 #include <msclr/marshal_cppstd.h>
 using namespace Controller;
 using namespace Engine;
+using namespace Model;
 
 namespace TeamBPathfinder
 {
