@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Scoreboard& scoreboard)
+bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Model::Scoreboard& scoreboard)
 {
 	std::ofstream file(filePath);
 
@@ -12,9 +12,9 @@ bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Sc
 		return false;
 	}
 
-	const std::vector<ScoreEntry>& scores = scoreboard.getScores();
+	const std::vector<Model::ScoreEntry>& scores = scoreboard.getScores();
 
-	for (const ScoreEntry& entry : scores)
+	for (const Model::ScoreEntry& entry : scores)
 	{
 		file << entry.getPlayerName() << "|"
 			<< entry.getPuzzleNumber() << "|"
@@ -24,7 +24,7 @@ bool ScoreboardFileHandler::saveScoreboard(const std::string& filePath, const Sc
 	return true;
 }
 
-bool ScoreboardFileHandler::loadScoreboard(const std::string& filePath, Scoreboard& scoreboard)
+bool ScoreboardFileHandler::loadScoreboard(const std::string& filePath, Model::Scoreboard& scoreboard)
 {
 	std::ifstream file(filePath);
 
@@ -63,7 +63,7 @@ bool ScoreboardFileHandler::loadScoreboard(const std::string& filePath, Scoreboa
 		int puzzleNumber = std::stoi(puzzleText);
 		int seconds = std::stoi(secondsText);
 
-		scoreboard.addScore(ScoreEntry(name, puzzleNumber, seconds));
+		scoreboard.addScore(Model::ScoreEntry(name, puzzleNumber, seconds));
 	}
 
 	return true;

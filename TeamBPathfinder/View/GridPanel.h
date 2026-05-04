@@ -10,6 +10,7 @@ namespace TeamBPathfinder {
 	using namespace System;
 	using namespace System::Windows::Forms;
 	using namespace System::Drawing;
+	using namespace Model;
 
 	public delegate void CellInputHandler(int row, int col, String^ text);
 
