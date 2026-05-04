@@ -10,10 +10,10 @@ class PuzzleFileHandler
 
 {
 public:
-	static std::vector<Puzzle> loadPuzzles(const std::string& filePath);
+	static std::vector<Model::Puzzle> loadPuzzles(const std::string& filePath);
 
 private:
-	static void readClueLine(Puzzle& puzzle, const std::string& line);
+	static void readClueLine(Model::Puzzle& puzzle, const std::string& line);
 
-	static void readSolutionRow(Puzzle& puzzle, const std::string& line, int row);
+	static void readSolutionRow(Model::Puzzle& puzzle, const std::string& line, int row);
 };

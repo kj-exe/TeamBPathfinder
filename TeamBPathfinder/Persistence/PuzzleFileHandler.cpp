@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-std::vector<Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
+std::vector<Model::Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
 {
 	std::ifstream file(filePath);
 
@@ -13,9 +13,9 @@ std::vector<Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
 		throw std::runtime_error("Could not open puzzle file: " + filePath);
 	}
 
-	std::vector<Puzzle> puzzles;
+	std::vector<Model::Puzzle> puzzles;
 	std::string line;
-	Puzzle currentPuzzle;
+	Model::Puzzle currentPuzzle;
 	bool hasCurrentPuzzle = false;
 	bool readingClues = false;
 	bool readingSolution = false;
@@ -29,7 +29,7 @@ std::vector<Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
 		if (line.find("PuzzleNumber:") == 0)
 		{
 			int puzzleNumber = std::stoi(line.substr(line.find(":") + 1));
-			currentPuzzle = Puzzle(puzzleNumber);
+			currentPuzzle = Model::Puzzle(puzzleNumber);
 
 			hasCurrentPuzzle = true;
 			readingClues = false;
@@ -73,7 +73,7 @@ std::vector<Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
 	return puzzles;
 }
 
-void PuzzleFileHandler::readClueLine(Puzzle& puzzle, const std::string& line)
+void PuzzleFileHandler::readClueLine(Model::Puzzle& puzzle, const std::string& line)
 {
 	std::stringstream ss(line);
 
@@ -86,7 +86,7 @@ void PuzzleFileHandler::readClueLine(Puzzle& puzzle, const std::string& line)
 	puzzle.addClue(row, col, value);
 }
 
-void PuzzleFileHandler::readSolutionRow(Puzzle& puzzle, const std::string& line, int row)
+void PuzzleFileHandler::readSolutionRow(Model::Puzzle& puzzle, const std::string& line, int row)
 {
 	std::stringstream ss(line);
 

@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-bool SettingsFileHandler::saveSettings(const std::string& filePath, const UserSettings& settings)
+bool SettingsFileHandler::saveSettings(const std::string& filePath, const Model::UserSettings& settings)
 {
     std::ofstream file(filePath);
 
@@ -16,7 +16,7 @@ bool SettingsFileHandler::saveSettings(const std::string& filePath, const UserSe
     return true;
 }
 
-bool SettingsFileHandler::loadSettings(const std::string& filePath, UserSettings& settings)
+bool SettingsFileHandler::loadSettings(const std::string& filePath, Model::UserSettings& settings)
 {
     std::ifstream file(filePath);
 

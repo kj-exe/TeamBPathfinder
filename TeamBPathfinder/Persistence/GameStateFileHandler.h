@@ -6,6 +6,6 @@
 class GameStateFileHandler
 {
 public:
-    static bool saveGameState(const std::string& filePath, const GameSnapshot& snapshot);
-    static bool loadGameState(const std::string& filePath, GameSnapshot& snapshot);
+    static bool saveGameState(const std::string& filePath, const Model::GameSnapshot& snapshot);
+    static bool loadGameState(const std::string& filePath, Model::GameSnapshot& snapshot);
 };

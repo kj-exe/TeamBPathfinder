@@ -3,27 +3,30 @@
 
 #include <stdexcept>
 
-PuzzleRepository::PuzzleRepository(const std::string& puzzleFilePath)
+namespace Model
 {
-	this->puzzles = PuzzleFileHandler::loadPuzzles(puzzleFilePath);
-
-	if (this->puzzles.empty())
+	PuzzleRepository::PuzzleRepository(const std::string& puzzleFilePath)
 	{
-		throw std::runtime_error("No puzzles were loaded.");
-	}
-}
+		this->puzzles = PuzzleFileHandler::loadPuzzles(puzzleFilePath);
 
-Puzzle PuzzleRepository::getPuzzle(int index) const
-{
-	if (index < 0 || index >= (int)this->puzzles.size())
-	{
-		throw std::out_of_range("Puzzle index is out of range.");
+		if (this->puzzles.empty())
+		{
+			throw std::runtime_error("No puzzles were loaded.");
+		}
 	}
 
-	return this->puzzles[index];
-}
+	Puzzle PuzzleRepository::getPuzzle(int index) const
+	{
+		if (index < 0 || index >= (int)this->puzzles.size())
+		{
+			throw std::out_of_range("Puzzle index is out of range.");
+		}
 
-int PuzzleRepository::getCount() const
-{
-	return (int)this->puzzles.size();
+		return this->puzzles[index];
+	}
+
+	int PuzzleRepository::getCount() const
+	{
+		return (int)this->puzzles.size();
+	}
 }
