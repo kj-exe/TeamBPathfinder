@@ -30,4 +30,10 @@ namespace Utils
 
 		return msclr::interop::marshal_as<std::string>(fullPath);
 	}
+
+	std::string PathHelper::getSettingsFilePath()
+	{
+		System::String^ pathManaged = System::Windows::Forms::Application::StartupPath + "\\settings.txt";
+		return msclr::interop::marshal_as<std::string>(pathManaged);
+	}
 }

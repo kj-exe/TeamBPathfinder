@@ -127,9 +127,11 @@
     <ClCompile Include="Model\PuzzleRepository.cpp" />
     <ClCompile Include="Model\Scoreboard.cpp" />
     <ClCompile Include="Model\ScoreEntry.cpp" />
+    <ClCompile Include="Model\UserSettings.cpp" />
     <ClCompile Include="Persistence\GameStateFileHandler.cpp" />
     <ClCompile Include="Persistence\PuzzleFileHandler.cpp" />
     <ClCompile Include="Persistence\ScoreboardFileHandler.cpp" />
+    <ClCompile Include="Persistence\SettingsFileHandler.cpp" />
     <ClCompile Include="Utils\PathHelper.cpp" />
     <ClCompile Include="View\MainForm.cpp" />
   </ItemGroup>
@@ -141,9 +143,11 @@
     <ClInclude Include="Model\PuzzleRepository.h" />
     <ClInclude Include="Model\Scoreboard.h" />
     <ClInclude Include="Model\ScoreEntry.h" />
+    <ClInclude Include="Model\UserSettings.h" />
     <ClInclude Include="Persistence\GameStateFileHandler.h" />
     <ClInclude Include="Persistence\PuzzleFileHandler.h" />
     <ClInclude Include="Persistence\ScoreboardFileHandler.h" />
+    <ClInclude Include="Persistence\SettingsFileHandler.h" />
     <ClInclude Include="Utils\PathHelper.h" />
     <ClInclude Include="View\GridPanel.h" />
     <ClInclude Include="View\MainForm.h">
@@ -151,6 +155,7 @@
     </ClInclude>
     <ClInclude Include="View\NameEntryForm.h" />
     <ClInclude Include="View\ScoreboardForm.h" />
+    <ClInclude Include="View\SettingsForm.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="View\MainForm.resx">

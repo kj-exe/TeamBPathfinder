@@ -2,6 +2,7 @@
 
 #pragma managed(push, off)
 #include "../Engine/GameEngine.h"
+#include "../Model/UserSettings.h"
 #pragma managed(pop)
 
 namespace TeamBPathfinder {
@@ -26,12 +27,23 @@ namespace TeamBPathfinder {
 			cellPanels = gcnew array<Panel^, 2>(BOARD_SIZE, BOARD_SIZE);
 			cellTextBoxes = gcnew array<TextBox^, 2>(BOARD_SIZE, BOARD_SIZE);
 
+			cellColor = Color::White;
+			fixedCellColor = Color::FromArgb(220, 220, 220);
+			numberColor = Color::FromArgb(60, 60, 60);
+
 			this->Size = Drawing::Size(
 				BOARD_SIZE * CELL_SIZE + 2,
 				BOARD_SIZE * CELL_SIZE + 2
 			);
 			this->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 			BuildCells();
+		}
+
+		void ApplySettings(UserSettings* settings)
+		{
+			cellColor = Color::FromArgb(settings->getCellColor());
+			fixedCellColor = Color::FromArgb(settings->getFixedCellColor());
+			numberColor = Color::FromArgb(settings->getNumberColor());
 		}
 
 		void UpdateCell(int row, int col, int value, bool isFixed)
@@ -44,20 +56,20 @@ namespace TeamBPathfinder {
 			else
 				textBox->Text = "";
 
+			textBox->ForeColor = numberColor;
+
 			if (isFixed)
 			{
 				textBox->ReadOnly = true;
-				panel->BackColor = Color::FromArgb(220, 220, 220);
-				textBox->BackColor = Color::FromArgb(220, 220, 220);
-				textBox->ForeColor = Color::FromArgb(40, 40, 40);
+				panel->BackColor = fixedCellColor;
+				textBox->BackColor = fixedCellColor;
 				textBox->Font = (gcnew Drawing::Font(L"Segoe UI", 13, FontStyle::Bold));
 			}
 			else
 			{
 				textBox->ReadOnly = false;
-				panel->BackColor = Color::White;
-				textBox->BackColor = Color::White;
-				textBox->ForeColor = Color::FromArgb(60, 60, 60);
+				panel->BackColor = cellColor;
+				textBox->BackColor = cellColor;
 				textBox->Font = (gcnew Drawing::Font(L"Segoe UI", 13));
 			}
 		}
@@ -65,8 +77,8 @@ namespace TeamBPathfinder {
 		void ClearCell(int row, int col)
 		{
 			cellTextBoxes[row, col]->Text = "";
-			cellPanels[row, col]->BackColor = Color::White;
-			cellTextBoxes[row, col]->BackColor = Color::White;
+			cellPanels[row, col]->BackColor = cellColor;
+			cellTextBoxes[row, col]->BackColor = cellColor;
 		}
 
 		void HighlightCellError(int row, int col)
@@ -77,13 +89,16 @@ namespace TeamBPathfinder {
 
 		void ResetCellColor(int row, int col)
 		{
-			cellPanels[row, col]->BackColor = Color::White;
-			cellTextBoxes[row, col]->BackColor = Color::White;
+			cellPanels[row, col]->BackColor = cellColor;
+			cellTextBoxes[row, col]->BackColor = cellColor;
 		}
 
 	private:
 		array<Panel^, 2>^ cellPanels;
 		array<TextBox^, 2>^ cellTextBoxes;
+		Color cellColor;
+		Color fixedCellColor;
+		Color numberColor;
 
 		void BuildCells()
 		{
@@ -98,7 +113,7 @@ namespace TeamBPathfinder {
 			panel->Size = Drawing::Size(CELL_SIZE, CELL_SIZE);
 			panel->Location = Point(col * CELL_SIZE, row * CELL_SIZE);
 			panel->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			panel->BackColor = Color::White;
+			panel->BackColor = cellColor;
 			panel->Tag = gcnew Point(row, col);
 			panel->Click += gcnew EventHandler(this, &GridPanel::Panel_Click);
 
