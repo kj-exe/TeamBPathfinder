@@ -19,6 +19,7 @@
 #include "NameEntryForm.h"
 #include "SettingsForm.h"
 #include <msclr/marshal_cppstd.h>
+using namespace Controller;
 
 namespace TeamBPathfinder
 {
