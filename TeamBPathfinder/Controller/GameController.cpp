@@ -28,7 +28,7 @@ namespace Controller
 		this->saveCurrentBoardToMemory();
 		this->currentPuzzleIndex = index;
 
-		Puzzle puzzle = this->repository->getPuzzle(index);
+		Model::Puzzle puzzle = this->repository->getPuzzle(index);
 		this->engine->loadFromPuzzle(puzzle);
 
 		this->restoreBoardFromMemory(index);
@@ -47,7 +47,7 @@ namespace Controller
 			}
 		}
 
-		Puzzle puzzle = this->repository->getPuzzle(this->currentPuzzleIndex);
+		Model::Puzzle puzzle = this->repository->getPuzzle(this->currentPuzzleIndex);
 		this->engine->loadFromPuzzle(puzzle);
 	}
 
@@ -55,7 +55,7 @@ namespace Controller
 	{
 		this->currentPuzzleIndex = Constants::FIRST_PUZZLE_INDEX;
 
-		Puzzle puzzle = this->repository->getPuzzle(Constants::FIRST_PUZZLE_INDEX);
+		Model::Puzzle puzzle = this->repository->getPuzzle(Constants::FIRST_PUZZLE_INDEX);
 		this->engine->loadFromPuzzle(puzzle);
 
 		this->restoreBoardFromMemory(Constants::FIRST_PUZZLE_INDEX);
@@ -63,7 +63,7 @@ namespace Controller
 
 	void GameController::solveCurrentPuzzle()
 	{
-		Puzzle puzzle = this->repository->getPuzzle(this->currentPuzzleIndex);
+		Model::Puzzle puzzle = this->repository->getPuzzle(this->currentPuzzleIndex);
 
 		for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
 		{
@@ -247,7 +247,7 @@ namespace Controller
 
 		this->currentPuzzleIndex = targetIndex;
 
-		Puzzle puzzle = this->repository->getPuzzle(targetIndex);
+		Model::Puzzle puzzle = this->repository->getPuzzle(targetIndex);
 		this->engine->loadFromPuzzle(puzzle);
 
 		this->restoreBoardFromMemory(targetIndex);

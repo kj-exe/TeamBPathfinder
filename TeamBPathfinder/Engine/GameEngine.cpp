@@ -21,10 +21,10 @@ namespace Engine
 		}
 	}
 
-	void GameEngine::loadFromPuzzle(const Puzzle& puzzle)
+	void GameEngine::loadFromPuzzle(const Model::Puzzle& puzzle)
 	{
 		initBoard();
-		const std::vector<Clue>& clues = puzzle.getClues();
+		const std::vector<Model::Clue>& clues = puzzle.getClues();
 		for (size_t i = 0; i < clues.size(); i++)
 		{
 			setFixed(clues[i].row, clues[i].col, clues[i].value);

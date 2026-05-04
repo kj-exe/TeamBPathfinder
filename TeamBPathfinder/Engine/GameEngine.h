@@ -38,7 +38,7 @@ namespace Engine
 		/// Loads a puzzle into the board by applying its fixed clue values.
 		/// </summary>
 		/// <param name="puzzle">The puzzle containing clue data.</param>
-		void loadFromPuzzle(const Puzzle& puzzle);
+		void loadFromPuzzle(const Model::Puzzle& puzzle);
 
 		/// <summary>
 		/// Gets the value at the specified board cell.

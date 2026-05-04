@@ -7,13 +7,13 @@
 class PuzzleRepository
 {
 private:
-	std::vector<Puzzle> puzzles;
+	std::vector<Model::Puzzle> puzzles;
 
 
 public:
 	PuzzleRepository(const std::string& puzzleFilePath);
 
 
-	Puzzle getPuzzle(int index) const;
+	Model::Puzzle getPuzzle(int index) const;
 	int getCount() const;
 };

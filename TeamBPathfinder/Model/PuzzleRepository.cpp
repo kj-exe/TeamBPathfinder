@@ -13,7 +13,7 @@ PuzzleRepository::PuzzleRepository(const std::string& puzzleFilePath)
 	}
 }
 
-Puzzle PuzzleRepository::getPuzzle(int index) const
+Model::Puzzle PuzzleRepository::getPuzzle(int index) const
 {
 	if (index < 0 || index >= (int)this->puzzles.size())
 	{
