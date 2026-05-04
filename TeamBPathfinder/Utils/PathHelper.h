@@ -12,5 +12,6 @@ namespace Utils
 		static std::string getSaveFilePath();
 
 		static std::string getScoreboardFilePath();
+		static std::string getSettingsFilePath();
 	};
 }

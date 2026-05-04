@@ -10,15 +10,15 @@
 #include "../Model/Scoreboard.h"
 #include "../Model/ScoreEntry.h"
 #include "../Persistence/ScoreboardFileHandler.h"
+#include "../Model/UserSettings.h"
+#include "../Persistence/SettingsFileHandler.h"
 #pragma managed(pop)
 
 #include "GridPanel.h"
 #include "ScoreboardForm.h"
 #include "NameEntryForm.h"
+#include "SettingsForm.h"
 #include <msclr/marshal_cppstd.h>
-
-
-
 
 namespace TeamBPathfinder
 {
@@ -71,6 +71,10 @@ namespace TeamBPathfinder
 				throw;
 			}
 
+			userSettings = new UserSettings();
+			std::string settingsPath = Utils::PathHelper::getSettingsFilePath();
+			SettingsFileHandler::loadSettings(settingsPath, *userSettings);
+
 			SetUpUI();
 			SetupGrid();
 			SetupTimer();
@@ -113,6 +117,9 @@ namespace TeamBPathfinder
 
 			if (scoreboard)
 				delete scoreboard;
+
+			if (userSettings)
+				delete userSettings;
 		}
 
 	private:
@@ -133,6 +140,7 @@ namespace TeamBPathfinder
 		GameController* controller;
 		bool isPaused;
 		Scoreboard* scoreboard;
+		UserSettings* userSettings;
 
 		System::Windows::Forms::Button^ resetButton;
 		System::Windows::Forms::Button^ submitButton;
@@ -234,6 +242,7 @@ namespace TeamBPathfinder
 		void SetupGrid()
 		{
 			gridPanel = gcnew GridPanel();
+			gridPanel->ApplySettings(userSettings);
 			gridPanel->Location = Point(GRID_MARGIN, GRID_TOP);
 			gridPanel->OnCellInput += gcnew CellInputHandler(this, &MainForm::HandleCellInput);
 			this->Controls->Add(gridPanel);
@@ -285,8 +294,14 @@ namespace TeamBPathfinder
 			resetScores->Click += gcnew EventHandler(this, &MainForm::OnResetScoresClicked);
 			scoresMenu->DropDownItems->Add(resetScores);
 
+			ToolStripMenuItem^ settingsMenu = gcnew ToolStripMenuItem("Settings");
+			ToolStripMenuItem^ openSettings = gcnew ToolStripMenuItem("Colors...");
+			openSettings->Click += gcnew EventHandler(this, &MainForm::OnSettingsClicked);
+			settingsMenu->DropDownItems->Add(openSettings);
+
 			menuStrip->Items->Add(gameMenu);
 			menuStrip->Items->Add(puzzleMenu);
+			menuStrip->Items->Add(settingsMenu);
 			menuStrip->Items->Add(scoresMenu);
 
 			this->MainMenuStrip = menuStrip;
@@ -597,6 +612,18 @@ namespace TeamBPathfinder
 			ScoreboardFileHandler::saveScoreboard(scorePath, *scoreboard);
 
 			ShowMessage("Scoreboard has been reset.", "Reset Complete");
+		}
+
+		System::Void OnSettingsClicked(Object^ sender, EventArgs^ e)
+		{
+			SettingsForm^ dialog = gcnew SettingsForm(userSettings);
+			dialog->ShowDialog(this);
+
+			std::string settingsPath = Utils::PathHelper::getSettingsFilePath();
+			SettingsFileHandler::saveSettings(settingsPath, *userSettings);
+
+			gridPanel->ApplySettings(userSettings);
+			RefreshGrid();
 		}
 	};
 }
