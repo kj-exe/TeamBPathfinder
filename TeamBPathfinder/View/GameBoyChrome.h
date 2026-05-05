@@ -58,7 +58,7 @@ namespace TeamBPathfinder
             return HitResult::None;
         }
 
-        // Layout constants — exposed for MainForm to align its own controls
+        // Layout constants ï¿½ exposed for MainForm to align its own controls
         static const int GRID_MARGIN = 28;
         static const int MENU_HEIGHT = 24;
         static const int BRAND_TOP = MENU_HEIGHT + 14;
@@ -70,12 +70,13 @@ namespace TeamBPathfinder
         static const int BOTTOM_BTN_H = 38;
         static const int BOTTOM_BTN_GAP = 14;
 
-        // Plastic palette — exposed so labels/buttons can match the skin
+        // Plastic palette ï¿½ exposed so labels/buttons can match the skin
         static initonly Color PLASTIC = Color::FromArgb(196, 190, 183);
         static initonly Color PLASTIC_HI = Color::FromArgb(220, 215, 208);
         static initonly Color PLASTIC_LO = Color::FromArgb(150, 144, 138);
         static initonly Color PLASTIC_SHADE = Color::FromArgb(170, 164, 158);
         static initonly Color INK = Color::FromArgb(40, 40, 50);
+        static initonly Color BUTTON_BORDER = Color::FromArgb(80, 80, 90);
 
     private:
         int formWidth;
@@ -90,7 +91,7 @@ namespace TeamBPathfinder
         Point bButtonCenter;
         int abButtonRadius;
 
-        // Game Boy palette — internal to skin
+        // Game Boy palette ï¿½ internal to skin
         static initonly Color BEZEL = Color::FromArgb(48, 56, 80);
         static initonly Color BEZEL_DK = Color::FromArgb(28, 34, 52);
         static initonly Color BUTTON_BODY = Color::FromArgb(146, 38, 86);

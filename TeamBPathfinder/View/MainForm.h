@@ -16,18 +16,20 @@
 
 #include "GridPanel.h"
 #include "GameBoyChrome.h"
+#include "GamepadInput.h"
+#include "BoardCoordinator.h"
 #include "ScoreboardForm.h"
 #include "NameEntryForm.h"
 #include "SettingsForm.h"
 #include <msclr/marshal_cppstd.h>
 
-using namespace Controller;
-using namespace Engine;
-using namespace Model;
-using namespace Persistence;
-
 namespace TeamBPathfinder
 {
+    using namespace Controller;
+    using namespace Engine;
+    using namespace Model;
+    using namespace Persistence;
+
     using namespace System;
     using namespace System::ComponentModel;
     using namespace System::Windows::Forms;
@@ -58,8 +60,10 @@ namespace TeamBPathfinder
             buildGameTimer();
             buildMenuBar();
 
+            coordinator = gcnew BoardCoordinator(gridPanel, labelPuzzle, labelTimer, controller);
+
             loadSavedGame();
-            refreshAllViews();
+            coordinator->refreshAllViews();
             gameTimer->Start();
 
             this->KeyPreview = true;
@@ -101,12 +105,12 @@ namespace TeamBPathfinder
 
             switch (chrome->hitTest(e->Location))
             {
-            case GameBoyChrome::HitResult::DPadUp:    moveSelection(-1, 0); break;
-            case GameBoyChrome::HitResult::DPadDown:  moveSelection(1, 0); break;
-            case GameBoyChrome::HitResult::DPadLeft:  moveSelection(0, -1); break;
-            case GameBoyChrome::HitResult::DPadRight: moveSelection(0, 1); break;
-            case GameBoyChrome::HitResult::ButtonA:   pressPlaceButton(); break;
-            case GameBoyChrome::HitResult::ButtonB:   pressDeleteButton(); break;
+            case GameBoyChrome::HitResult::DPadUp:    gamepad->moveSelection(-1, 0); break;
+            case GameBoyChrome::HitResult::DPadDown:  gamepad->moveSelection(1, 0); break;
+            case GameBoyChrome::HitResult::DPadLeft:  gamepad->moveSelection(0, -1); break;
+            case GameBoyChrome::HitResult::DPadRight: gamepad->moveSelection(0, 1); break;
+            case GameBoyChrome::HitResult::ButtonA:   gamepad->pressA(); break;
+            case GameBoyChrome::HitResult::ButtonB:   gamepad->pressB(); break;
             }
         }
 
@@ -114,10 +118,10 @@ namespace TeamBPathfinder
         {
             if (!isPaused)
             {
-                if (keyData == Keys::Up) { moveSelection(-1, 0); return true; }
-                if (keyData == Keys::Down) { moveSelection(1, 0);  return true; }
-                if (keyData == Keys::Left) { moveSelection(0, -1); return true; }
-                if (keyData == Keys::Right) { moveSelection(0, 1);  return true; }
+                if (keyData == Keys::Up) { gamepad->moveSelection(-1, 0); return true; }
+                if (keyData == Keys::Down) { gamepad->moveSelection(1, 0);  return true; }
+                if (keyData == Keys::Left) { gamepad->moveSelection(0, -1); return true; }
+                if (keyData == Keys::Right) { gamepad->moveSelection(0, 1);  return true; }
             }
             return Form::ProcessCmdKey(msg, keyData);
         }
@@ -136,6 +140,8 @@ namespace TeamBPathfinder
 
         GameBoyChrome^ chrome;
         GridPanel^ gridPanel;
+        GamepadInput^ gamepad;
+        BoardCoordinator^ coordinator;
 
         GameEngine* gameEngine;
         PuzzleRepository* repository;
@@ -323,7 +329,7 @@ namespace TeamBPathfinder
             button->Font = gcnew Drawing::Font(L"Consolas", 10, FontStyle::Bold);
             button->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
             button->FlatAppearance->BorderSize = 1;
-            button->FlatAppearance->BorderColor = Color::FromArgb(80, 80, 90);
+            button->FlatAppearance->BorderColor = GameBoyChrome::BUTTON_BORDER;
             button->BackColor = GameBoyChrome::PLASTIC_HI;
             button->ForeColor = GameBoyChrome::INK;
             button->UseVisualStyleBackColor = false;
@@ -337,6 +343,8 @@ namespace TeamBPathfinder
             gridPanel->Location = Point(GameBoyChrome::GRID_MARGIN, getGridTop());
             gridPanel->OnCellInput += gcnew CellInputHandler(this, &MainForm::handleCellInput);
             this->Controls->Add(gridPanel);
+            
+            gamepad = gcnew GamepadInput(gridPanel, controller);
         }
 
         void buildGameTimer()
@@ -421,53 +429,6 @@ namespace TeamBPathfinder
             return menu;
         }
 
-        // ----- View synchronization -----
-
-        void refreshAllViews()
-        {
-            refreshGrid();
-            refreshPuzzleLabel();
-            refreshTimerLabel();
-        }
-
-        void refreshGrid()
-        {
-            for (int row = 0; row < GridPanel::BOARD_SIZE; row++)
-                for (int col = 0; col < GridPanel::BOARD_SIZE; col++)
-                    gridPanel->UpdateCell(row, col, controller->getValue(row, col), controller->isFixed(row, col));
-        }
-
-        void refreshPuzzleLabel()
-        {
-            labelPuzzle->Text = "PUZZLE " + controller->getCurrentPuzzleNumber().ToString();
-        }
-
-        void refreshTimerLabel()
-        {
-            labelTimer->Text = formatElapsedTime(controller->getElapsedSeconds());
-        }
-
-        String^ formatElapsedTime(int totalSeconds)
-        {
-            int minutes = totalSeconds / 60;
-            int seconds = totalSeconds % 60;
-            return String::Format("{0:00}:{1:00}", minutes, seconds);
-        }
-
-        void advanceToNextPuzzle()
-        {
-            int nextIndex = controller->getCurrentPuzzleNumber();
-            if (nextIndex < controller->getPuzzleCount())
-            {
-                controller->startPuzzle(nextIndex);
-                refreshAllViews();
-            }
-            else
-            {
-                showInfoMessage("You've completed all puzzles! Great job!", "Game Complete");
-            }
-        }
-
         // ----- Persistence -----
 
         void loadSavedGame()
@@ -496,102 +457,9 @@ namespace TeamBPathfinder
 
             switch (e->KeyCode)
             {
-            case Keys::A: pressPlaceButton(); e->Handled = true; break;
-            case Keys::B: pressDeleteButton(); e->Handled = true; break;
+            case Keys::A: gamepad->pressA(); e->Handled = true; break;
+            case Keys::B: gamepad->pressB(); e->Handled = true; break;
             }
-        }
-
-        void moveSelection(int rowDelta, int colDelta)
-        {
-            int newRow = gridPanel->GetSelectedRow() + rowDelta;
-            int newCol = gridPanel->GetSelectedCol() + colDelta;
-
-            if (newRow < 0 || newRow >= GridPanel::BOARD_SIZE) return;
-            if (newCol < 0 || newCol >= GridPanel::BOARD_SIZE) return;
-
-            this->ActiveControl = nullptr;
-            gridPanel->SetSelectedCell(newRow, newCol);
-            gridPanel->FocusSelectedCell();
-        }
-
-        void pressPlaceButton()
-        {
-            if (controller->isCurrentPuzzleSolved()) return;
-
-            int row = gridPanel->GetSelectedRow();
-            int col = gridPanel->GetSelectedCol();
-
-            if (controller->isFixed(row, col) || controller->getValue(row, col) > 0)
-            {
-                if (!findNextEmptyCell(row, col))
-                    return;
-                gridPanel->SetSelectedCell(row, col);
-            }
-
-            int nextNumber = computeNextAvailableNumber();
-            if (nextNumber < 1) return;
-
-            MoveResult result = controller->attemptMove(row, col, nextNumber);
-            if (result == MoveResult::Accepted)
-            {
-                gridPanel->UpdateCell(row, col, nextNumber, false);
-                gridPanel->ResetCellColor(row, col);
-            }
-        }
-
-        void pressDeleteButton()
-        {
-            if (controller->isCurrentPuzzleSolved()) return;
-
-            int row = gridPanel->GetSelectedRow();
-            int col = gridPanel->GetSelectedCol();
-
-            if (controller->isFixed(row, col)) return;
-
-            controller->clearCell(row, col);
-            gridPanel->UpdateCell(row, col, 0, false);
-            gridPanel->ResetCellColor(row, col);
-        }
-
-        bool findNextEmptyCell(int% row, int% col)
-        {
-            int startIndex = row * GridPanel::BOARD_SIZE + col;
-            int total = GridPanel::BOARD_SIZE * GridPanel::BOARD_SIZE;
-
-            for (int i = 0; i < total; i++)
-            {
-                int idx = (startIndex + i) % total;
-                int candidateRow = idx / GridPanel::BOARD_SIZE;
-                int candidateCol = idx % GridPanel::BOARD_SIZE;
-
-                if (!controller->isFixed(candidateRow, candidateCol) &&
-                    controller->getValue(candidateRow, candidateCol) == 0)
-                {
-                    row = candidateRow;
-                    col = candidateCol;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        int computeNextAvailableNumber()
-        {
-            const int boardCellCount = GridPanel::BOARD_SIZE * GridPanel::BOARD_SIZE;
-            array<bool>^ used = gcnew array<bool>(boardCellCount + 1);
-
-            for (int row = 0; row < GridPanel::BOARD_SIZE; row++)
-                for (int col = 0; col < GridPanel::BOARD_SIZE; col++)
-                {
-                    int value = controller->getValue(row, col);
-                    if (value >= 1 && value <= boardCellCount)
-                        used[value] = true;
-                }
-
-            for (int n = 1; n <= boardCellCount; n++)
-                if (!used[n])
-                    return n;
-            return -1;
         }
 
         // ----- Cell input from clicking -----
@@ -679,7 +547,7 @@ namespace TeamBPathfinder
         {
             if (controller->isCurrentPuzzleSolved()) return;
             controller->tick();
-            refreshTimerLabel();
+            coordinator->refreshTimerLabel();
         }
 
         System::Void onResetClicked(Object^ sender, EventArgs^ e)
@@ -688,8 +556,8 @@ namespace TeamBPathfinder
             if (isPaused) return;
 
             controller->resetCurrentPuzzle();
-            refreshGrid();
-            refreshTimerLabel();
+            coordinator->refreshGrid();
+            coordinator->refreshTimerLabel();
             if (!controller->isCurrentPuzzleSolved())
                 gameTimer->Start();
         }
@@ -721,10 +589,14 @@ namespace TeamBPathfinder
             }
 
             showInfoMessage(
-                "Congratulations! You solved the puzzle in " + formatElapsedTime(finalSeconds) + "!",
+                "Congratulations! You solved the puzzle in " + BoardCoordinator::formatElapsedTime(finalSeconds) + "!",
                 "Puzzle Complete");
 
-            advanceToNextPuzzle();
+            if (!coordinator->advanceToNextPuzzle())
+            {
+                showInfoMessage("You've completed all puzzles! Great job!", "Game Complete");
+            }
+            
             if (!controller->isCurrentPuzzleSolved())
                 gameTimer->Start();
         }
@@ -754,7 +626,7 @@ namespace TeamBPathfinder
             this->ActiveControl = nullptr;
             if (isPaused) return;
             controller->solveCurrentPuzzle();
-            refreshGrid();
+            coordinator->refreshGrid();
         }
 
         System::Void onNewGameClicked(Object^ sender, EventArgs^ e)
@@ -773,7 +645,10 @@ namespace TeamBPathfinder
             controller = new GameController(gameEngine, repository);
             controller->initializeFirstPuzzle();
 
-            refreshAllViews();
+            gamepad = gcnew GamepadInput(gridPanel, controller);
+            coordinator = gcnew BoardCoordinator(gridPanel, labelPuzzle, labelTimer, controller);
+
+            coordinator->refreshAllViews();
         }
 
         void deleteSaveFile()
@@ -802,7 +677,7 @@ namespace TeamBPathfinder
             int targetIndex = safe_cast<int>(item->Tag);
 
             controller->startPuzzle(targetIndex);
-            refreshAllViews();
+            coordinator->refreshAllViews();
         }
 
         System::Void onViewScoresClicked(Object^ sender, EventArgs^ e)
@@ -838,7 +713,7 @@ namespace TeamBPathfinder
             SettingsFileHandler::saveSettings(settingsPath, *userSettings);
 
             gridPanel->ApplySettings(userSettings);
-            refreshGrid();
+            coordinator->refreshGrid();
         }
     };
 }
