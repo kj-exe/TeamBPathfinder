@@ -83,7 +83,10 @@ namespace TeamBPathfinder {
         /// </summary>
         void refreshPuzzleLabel()
         {
-            labelPuzzle->Text = "PUZZLE " + controller->getCurrentPuzzleNumber().ToString();
+            String^ text = "PUZZLE " + controller->getCurrentPuzzleNumber().ToString();
+            if (controller->isCurrentPuzzleSolved())
+                text += " COMPLETED";
+            labelPuzzle->Text = text;
         }
 
         /// <summary>

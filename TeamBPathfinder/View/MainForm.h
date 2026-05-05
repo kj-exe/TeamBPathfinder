@@ -756,11 +756,11 @@ namespace TeamBPathfinder
         /// Handles the submit button click.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        /// <param name="e">The event arguments.</param>
         System::Void onSubmitClicked(Object^ sender, EventArgs^ e)
         {
             this->ActiveControl = nullptr;
             if (isPaused) return;
+            if (controller->isCurrentPuzzleSolved()) return;
 
             MoveResult result = controller->submitPuzzle();
 
