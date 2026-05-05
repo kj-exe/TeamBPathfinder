@@ -22,6 +22,7 @@
 using namespace Controller;
 using namespace Engine;
 using namespace Model;
+using namespace Persistence;
 
 namespace TeamBPathfinder
 {

@@ -1,96 +1,124 @@
 #include "GameStateFileHandler.h"
+#include "../Common/Constants.h"
 
 #include <fstream>
 #include <limits>
 
-bool GameStateFileHandler::saveGameState(const std::string& filePath, const Model::GameSnapshot& snapshot)
+namespace Persistence
 {
-    std::ofstream file(filePath);
+	static const std::string CURRENT_PUZZLE_INDEX_LABEL = "CurrentPuzzleIndex: ";
+	static const std::string PUZZLE_COUNT_LABEL = "PuzzleCount: ";
+	static const std::string PUZZLE_INDEX_LABEL = "PuzzleIndex: ";
+	static const std::string BOARD_LABEL = "Board:";
+	static const std::string SOLVED_LABEL = "Solved: ";
+	static const std::string SECONDS_LABEL = "Seconds: ";
+	static const char SPACE_SEPARATOR = ' ';
 
-    if (!file)
-        return false;
+	bool GameStateFileHandler::saveGameState(const std::string& filePath, const Model::GameSnapshot& snapshot)
+	{
+		std::ofstream file(filePath);
 
-    file << "CurrentPuzzleIndex: " << snapshot.getCurrentPuzzleIndex() << std::endl;
-    file << "PuzzleCount: " << snapshot.getBoardCount() << std::endl;
+		if (!file)
+		{
+			return false;
+		}
 
-    for (int puzzleIndex = 0; puzzleIndex < snapshot.getBoardCount(); puzzleIndex++)
-    {
-        file << "PuzzleIndex: " << puzzleIndex << std::endl;
-        file << "Board:" << std::endl;
+		file << CURRENT_PUZZLE_INDEX_LABEL << snapshot.getCurrentPuzzleIndex() << std::endl;
+		file << PUZZLE_COUNT_LABEL << snapshot.getBoardCount() << std::endl;
 
-        for (int row = 0; row < 8; row++)
-        {
-            for (int col = 0; col < 8; col++)
-            {
-                file << snapshot.getValue(puzzleIndex, row, col);
+		for (int puzzleIndex = 0; puzzleIndex < snapshot.getBoardCount(); puzzleIndex++)
+		{
+			file << PUZZLE_INDEX_LABEL << puzzleIndex << std::endl;
+			file << BOARD_LABEL << std::endl;
 
-                if (col < 7)
-                    file << " ";
-            }
-            file << std::endl;
-        }
-        
-        file << "Solved: " << (snapshot.getSolved(puzzleIndex) ? 1 : 0) << std::endl;
-        file << "Seconds: " << snapshot.getSeconds(puzzleIndex) << std::endl;
-    }
+			for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
+			{
+				for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
+				{
+					file << snapshot.getValue(puzzleIndex, row, col);
 
-    return true;
-}
+					if (col < Constants::BOARD_COLUMN_SIZE - Constants::DISPLAY_NUMBER_OFFSET)
+					{
+						file << SPACE_SEPARATOR;
+					}
+				}
+				file << std::endl;
+			}
 
-bool GameStateFileHandler::loadGameState(const std::string& filePath, Model::GameSnapshot& snapshot)
-{
-    std::ifstream file(filePath);
+			file << SOLVED_LABEL << (snapshot.getSolved(puzzleIndex) ? 1 : 0) << std::endl;
+			file << SECONDS_LABEL << snapshot.getSeconds(puzzleIndex) << std::endl;
+		}
 
-    if (!file)
-        return false;
+		return true;
+	}
 
-    std::string line;
+	bool GameStateFileHandler::loadGameState(const std::string& filePath, Model::GameSnapshot& snapshot)
+	{
+		std::ifstream file(filePath);
 
-    std::getline(file, line);
-    int currentPuzzleIndex = std::stoi(line.substr(line.find(":") + 1));
+		if (!file)
+		{
+			return false;
+		}
 
-    std::getline(file, line);
-    int boardCount = std::stoi(line.substr(line.find(":") + 1));
+		std::string line;
 
-    if (boardCount != snapshot.getBoardCount())
-        return false;
+		std::getline(file, line);
+		int currentPuzzleIndex = std::stoi(line.substr(CURRENT_PUZZLE_INDEX_LABEL.length()));
 
-    if (currentPuzzleIndex < 0 || currentPuzzleIndex >= boardCount)
-        return false;
+		std::getline(file, line);
+		int boardCount = std::stoi(line.substr(PUZZLE_COUNT_LABEL.length()));
 
-    snapshot.setCurrentPuzzleIndex(currentPuzzleIndex);
+		if (boardCount != snapshot.getBoardCount())
+		{
+			return false;
+		}
 
-    for (int i = 0; i < boardCount; i++)
-    {
-        std::getline(file, line);
-        int puzzleIndex = std::stoi(line.substr(line.find(":") + 1));
+		if (currentPuzzleIndex < 0 || currentPuzzleIndex >= boardCount)
+		{
+			return false;
+		}
 
-        std::getline(file, line);
+		snapshot.setCurrentPuzzleIndex(currentPuzzleIndex);
 
-        if (puzzleIndex < 0 || puzzleIndex >= boardCount)
-            return false;
+		for (int i = 0; i < boardCount; i++)
+		{
+			std::getline(file, line);
+			int puzzleIndex = std::stoi(line.substr(PUZZLE_INDEX_LABEL.length()));
 
-        for (int row = 0; row < 8; row++)
-        {
-            for (int col = 0; col < 8; col++)
-            {
-                int value;
-                if (!(file >> value))
-                    return false;
+			std::getline(file, line);
 
-                snapshot.setValue(puzzleIndex, row, col, value);
-            }
-        }
-        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        
-        std::getline(file, line);
-        int solvedFlag = std::stoi(line.substr(line.find(":") + 1));
-        snapshot.setSolved(puzzleIndex, solvedFlag == 1);
+			if (puzzleIndex < 0 || puzzleIndex >= boardCount)
+			{
+				return false;
+			}
 
-        std::getline(file, line);
-        int seconds = std::stoi(line.substr(line.find(":") + 1));
-        snapshot.setSeconds(puzzleIndex, seconds);
-    }
+			for (int row = 0; row < Constants::BOARD_ROW_SIZE; row++)
+			{
+				for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
+				{
+					int value;
 
-    return true;
+					if (!(file >> value))
+					{
+						return false;
+					}
+
+					snapshot.setValue(puzzleIndex, row, col, value);
+				}
+			}
+
+			file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+			std::getline(file, line);
+			int solvedFlag = std::stoi(line.substr(SOLVED_LABEL.length()));
+			snapshot.setSolved(puzzleIndex, solvedFlag == 1);
+
+			std::getline(file, line);
+			int seconds = std::stoi(line.substr(SECONDS_LABEL.length()));
+			snapshot.setSeconds(puzzleIndex, seconds);
+		}
+
+		return true;
+	}
 }
