@@ -10,9 +10,16 @@ namespace TeamBPathfinder
 	using namespace System::Windows::Forms;
 	using namespace System::Drawing;
 
+	/// <summary>
+	/// Displays settings controls for changing grid colors.
+	/// </summary>
 	public ref class SettingsForm : public Form
 	{
 	public:
+		/// <summary>
+		/// Initializes a new settings form.
+		/// </summary>
+		/// <param name="settings">The user settings to edit.</param>
 		SettingsForm(UserSettings* settings)
 		{
 			this->settings = settings;

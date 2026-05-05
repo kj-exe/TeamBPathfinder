@@ -6,6 +6,9 @@ namespace TeamBPathfinder
 	using namespace System::Windows::Forms;
 	using namespace System::Drawing;
 
+	/// <summary>
+	/// Prompts the player to enter a name for a new high score.
+	/// </summary>
 	public ref class NameEntryForm : public Form
 	{
 	private:
@@ -14,6 +17,9 @@ namespace TeamBPathfinder
 		Button^ cancelButton;
 
 	public:
+		/// <summary>
+		/// Initializes a new name entry form.
+		/// </summary>
 		NameEntryForm()
 		{
 			this->Text = "New High Score";
@@ -66,6 +72,10 @@ namespace TeamBPathfinder
 			this->CancelButton = cancelButton;
 		}
 
+		/// <summary>
+		/// Gets the player name entered in the form.
+		/// </summary>
+		/// <returns>The entered player name.</returns>
 		String^ GetPlayerName()
 		{
 			return nameTextBox->Text;

@@ -60,8 +60,6 @@ namespace TeamBPathfinder
 
             gridPanel = nullptr;
             gamepad = nullptr;
-            coordinator = nullptr;
-            chrome = nullptr;
 
             gameEngine = nullptr;
             repository = nullptr;

@@ -9,9 +9,15 @@ namespace TeamBPathfinder
     using namespace System::Drawing;
     using namespace System::Drawing::Drawing2D;
 
+    /// <summary>
+    /// Draws and manages hit detection for the Game Boy-style visual chrome.
+    /// </summary>
     public ref class GameBoyChrome
     {
     public:
+        /// <summary>
+        /// Represents the clickable chrome control region hit by the mouse.
+        /// </summary>
         enum class HitResult
         {
             None,
@@ -23,6 +29,12 @@ namespace TeamBPathfinder
             ButtonB
         };
 
+        /// <summary>
+        /// Initializes a new Game Boy chrome renderer.
+        /// </summary>
+        /// <param name="formWidth">The width of the form.</param>
+        /// <param name="formHeight">The height of the form.</param>
+        /// <param name="gridTop">The top y-coordinate of the grid.</param>
         GameBoyChrome(int formWidth, int formHeight, int gridTop)
         {
             this->formWidth = formWidth;
@@ -31,6 +43,10 @@ namespace TeamBPathfinder
             computeControlBounds();
         }
 
+        /// <summary>
+        /// Paints the full Game Boy-style chrome.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paint(Graphics^ g)
         {
             g->SmoothingMode = SmoothingMode::AntiAlias;
@@ -43,6 +59,11 @@ namespace TeamBPathfinder
             paintStartSelectPills(g);
         }
 
+        /// <summary>
+        /// Determines which chrome control was hit by a mouse location.
+        /// </summary>
+        /// <param name="location">The mouse location to test.</param>
+        /// <returns>The hit result for the location.</returns>
         HitResult hitTest(Point location)
         {
             if (dpadUp.Contains(location)) return HitResult::DPadUp;
@@ -89,7 +110,6 @@ namespace TeamBPathfinder
         Point bButtonCenter;
         int abButtonRadius;
 
-        // Game Boy palette � internal to skin
         static initonly Color BEZEL = Color::FromArgb(48, 56, 80);
         static initonly Color BEZEL_DK = Color::FromArgb(28, 34, 52);
         static initonly Color BUTTON_BODY = Color::FromArgb(146, 38, 86);
@@ -102,6 +122,13 @@ namespace TeamBPathfinder
         static const int DPAD_ARM_THICKNESS = 44;
         static const int AB_BUTTON_RADIUS = 30;
 
+        /// <summary>
+        /// Determines whether a point is inside a circle.
+        /// </summary>
+        /// <param name="location">The point to test.</param>
+        /// <param name="center">The circle center.</param>
+        /// <param name="radius">The circle radius.</param>
+        /// <returns>True if the point is inside the circle; otherwise, false.</returns>
         bool isInsideCircle(Point location, Point center, int radius)
         {
             int dx = location.X - center.X;
@@ -109,6 +136,9 @@ namespace TeamBPathfinder
             return (dx * dx + dy * dy) <= (radius * radius);
         }
 
+        /// <summary>
+        /// Computes clickable bounds for the D-pad and action buttons.
+        /// </summary>
         void computeControlBounds()
         {
             int boardPx = GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
@@ -136,6 +166,10 @@ namespace TeamBPathfinder
             abButtonRadius = AB_BUTTON_RADIUS;
         }
 
+        /// <summary>
+        /// Paints the outer console case.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintConsoleCase(Graphics^ g)
         {
             Pen^ hi = gcnew Pen(PLASTIC_HI, 2.0f);
@@ -155,6 +189,10 @@ namespace TeamBPathfinder
             delete hi; delete lo; delete seamLo; delete seamHi;
         }
 
+        /// <summary>
+        /// Paints the screen bezel around the grid.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintScreenBezel(Graphics^ g)
         {
             int boardPx = GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
@@ -182,6 +220,11 @@ namespace TeamBPathfinder
             delete darkBrush; delete bezelBrush;
         }
 
+        /// <summary>
+        /// Paints the matrix label on the screen bezel.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="bezel">The bezel rectangle.</param>
         void paintMatrixLabel(Graphics^ g, Drawing::Rectangle bezel)
         {
             String^ tag = L"- LCD MATRIX -";
@@ -195,6 +238,12 @@ namespace TeamBPathfinder
             delete font; delete brush;
         }
 
+        /// <summary>
+        /// Paints the power LED and label.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="boardPx">The board size in pixels.</param>
+        /// <param name="padX">The horizontal bezel padding.</param>
         void paintPowerLed(Graphics^ g, int boardPx, int padX)
         {
             int ledX = GRID_MARGIN - padX + 4;
@@ -212,6 +261,10 @@ namespace TeamBPathfinder
             delete outer; delete inner; delete font; delete brush;
         }
 
+        /// <summary>
+        /// Paints the title branding.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintBranding(Graphics^ g)
         {
             Drawing::Font^ brandFont = gcnew Drawing::Font(
@@ -228,7 +281,7 @@ namespace TeamBPathfinder
 
             Drawing::Font^ subFont = gcnew Drawing::Font(L"Consolas", 7, FontStyle::Bold);
             SolidBrush^ subBrush = gcnew SolidBrush(Color::FromArgb(110, 110, 120));
-            g->DrawString(L"PUZZLE SYSTEM \u00B7 8-BIT EDITION", subFont, subBrush,
+            g->DrawString(L"8-BIT EDITION \u00B7 KELLEN & JAKE ", subFont, subBrush,
                 (float)x, (float)(y + 24));
 
             paintBrandingChevron(g, x, y);
@@ -237,6 +290,12 @@ namespace TeamBPathfinder
             delete subFont; delete subBrush;
         }
 
+        /// <summary>
+        /// Paints the branding chevron mark.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="brandX">The branding x-coordinate.</param>
+        /// <param name="brandY">The branding y-coordinate.</param>
         void paintBrandingChevron(Graphics^ g, int brandX, int brandY)
         {
             Pen^ pen = gcnew Pen(Color::FromArgb(40, 40, 55), 2.0f);
@@ -247,6 +306,10 @@ namespace TeamBPathfinder
             delete pen;
         }
 
+        /// <summary>
+        /// Paints the speaker grille.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintSpeakerGrille(Graphics^ g)
         {
             int boardPx = GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
@@ -265,12 +328,20 @@ namespace TeamBPathfinder
             delete slitDark; delete slitHi;
         }
 
+        /// <summary>
+        /// Paints the D-pad and action buttons.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintDPadAndButtons(Graphics^ g)
         {
             paintDPad(g);
             paintActionButtons(g);
         }
 
+        /// <summary>
+        /// Paints the directional pad.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintDPad(Graphics^ g)
         {
             int boardPx = GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
@@ -311,6 +382,12 @@ namespace TeamBPathfinder
             delete pad; delete cap; delete shade; delete capPen;
         }
 
+        /// <summary>
+        /// Paints the directional arrows on the D-pad.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="centerX">The D-pad center x-coordinate.</param>
+        /// <param name="centerY">The D-pad center y-coordinate.</param>
         void paintDPadArrows(Graphics^ g, int centerX, int centerY)
         {
             SolidBrush^ tri = gcnew SolidBrush(DPAD_TRI);
@@ -322,12 +399,24 @@ namespace TeamBPathfinder
             delete tri;
         }
 
+        /// <summary>
+        /// Paints the action buttons.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintActionButtons(Graphics^ g)
         {
             paintCircleButton(g, bButtonCenter.X, bButtonCenter.Y, abButtonRadius, L"DELETE");
             paintCircleButton(g, aButtonCenter.X, aButtonCenter.Y, abButtonRadius, L"PLACE");
         }
 
+        /// <summary>
+        /// Paints a circular action button.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="cx">The center x-coordinate.</param>
+        /// <param name="cy">The center y-coordinate.</param>
+        /// <param name="r">The button radius.</param>
+        /// <param name="label">The button label.</param>
         void paintCircleButton(Graphics^ g, int cx, int cy, int r, String^ label)
         {
             SolidBrush^ shade = gcnew SolidBrush(Color::FromArgb(70, 0, 0, 0));
@@ -353,6 +442,10 @@ namespace TeamBPathfinder
             delete font; delete brush;
         }
 
+        /// <summary>
+        /// Paints the start and select pill controls.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
         void paintStartSelectPills(Graphics^ g)
         {
             int boardPx = GridPanel::BOARD_SIZE * GridPanel::CELL_SIZE + 2;
@@ -364,6 +457,15 @@ namespace TeamBPathfinder
             paintPill(g, cx + 8, y, 32, 9, L"START");
         }
 
+        /// <summary>
+        /// Paints one pill-shaped control.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="x">The x-coordinate.</param>
+        /// <param name="y">The y-coordinate.</param>
+        /// <param name="w">The width.</param>
+        /// <param name="h">The height.</param>
+        /// <param name="label">The pill label.</param>
         void paintPill(Graphics^ g, int x, int y, int w, int h, String^ label)
         {
             Drawing::Rectangle r = Drawing::Rectangle(x, y, w, h);
@@ -384,6 +486,13 @@ namespace TeamBPathfinder
             delete shade; delete body; delete font; delete brush;
         }
 
+        /// <summary>
+        /// Fills a rounded rectangle.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="brush">The brush used to fill the rectangle.</param>
+        /// <param name="r">The rectangle to fill.</param>
+        /// <param name="radius">The corner radius.</param>
         void fillRoundedRect(Graphics^ g, Brush^ brush, Drawing::Rectangle r, int radius)
         {
             if (radius <= 0)
@@ -403,6 +512,14 @@ namespace TeamBPathfinder
             delete path;
         }
 
+        /// <summary>
+        /// Fills a chamfered rectangle.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="brush">The brush used to fill the rectangle.</param>
+        /// <param name="r">The rectangle to fill.</param>
+        /// <param name="chamfer">The chamfer amount.</param>
+        /// <param name="curve">The curve amount.</param>
         void fillChamferedRect(Graphics^ g, Brush^ brush, Drawing::Rectangle r, int chamfer, int curve)
         {
             GraphicsPath^ path = gcnew GraphicsPath();
@@ -419,6 +536,15 @@ namespace TeamBPathfinder
             delete path;
         }
 
+        /// <summary>
+        /// Draws a directional triangle.
+        /// </summary>
+        /// <param name="g">The graphics surface to paint on.</param>
+        /// <param name="brush">The brush used to fill the triangle.</param>
+        /// <param name="cx">The center x-coordinate.</param>
+        /// <param name="cy">The center y-coordinate.</param>
+        /// <param name="size">The triangle size.</param>
+        /// <param name="direction">The triangle direction.</param>
         void drawTriangle(Graphics^ g, Brush^ brush, int cx, int cy, int size, int direction)
         {
             array<Point>^ points = gcnew array<Point>(3);

@@ -10,6 +10,9 @@ namespace TeamBPathfinder
 	using namespace System::Drawing;
 	using namespace Model;
 
+	/// <summary>
+	/// Displays saved scoreboard entries and allows sorting by time or puzzle number.
+	/// </summary>
 	public ref class ScoreboardForm : public Form
 	{
 	private:
@@ -18,6 +21,10 @@ namespace TeamBPathfinder
 		ComboBox^ sortComboBox;
 
 	public:
+		/// <summary>
+		/// Initializes a new scoreboard form.
+		/// </summary>
+		/// <param name="scoreboard">The scoreboard to display.</param>
 		ScoreboardForm(const Scoreboard& scoreboard)
 		{
 			this->scoreboard = &scoreboard;
