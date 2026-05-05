@@ -150,6 +150,7 @@
     <ClInclude Include="Persistence\ScoreboardFileHandler.h" />
     <ClInclude Include="Persistence\SettingsFileHandler.h" />
     <ClInclude Include="Utils\PathHelper.h" />
+    <ClInclude Include="View\GameBoyChrome.h" />
     <ClInclude Include="View\GridPanel.h" />
     <ClInclude Include="View\MainForm.h">
       <FileType>CppForm</FileType>
