@@ -12,7 +12,6 @@ namespace Model
 	/// </summary>
 	class PuzzleRepository
 	{
-	private:
 		std::vector<Puzzle> puzzles;
 
 	public:

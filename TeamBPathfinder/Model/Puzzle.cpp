@@ -38,7 +38,7 @@ namespace Model
 		clues.push_back(clue);
 	}
 
-	void Puzzle::setSolution(int row, int col, int value)
+	void Puzzle::setSolution(const int row, const int col, int value)
 	{
 		solution[row][col] = value;
 	}
