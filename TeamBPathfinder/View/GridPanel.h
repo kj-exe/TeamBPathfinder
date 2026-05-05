@@ -457,7 +457,7 @@ namespace TeamBPathfinder {
             textBox->TabStop = false;
             textBox->Tag = gcnew Point(row, col);
 
-            textBox->TextChanged += gcnew EventHandler(this, &GridPanel::Cell_TextChanged);
+            textBox->Leave += gcnew EventHandler(this, &GridPanel::Cell_Leave);
 
             panel->Controls->Add(textBox);
 
@@ -516,11 +516,8 @@ namespace TeamBPathfinder {
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="e">The event arguments.</param>
-        void Cell_TextChanged(Object^ sender, EventArgs^ e)
+        void Cell_Leave(Object^ sender, EventArgs^ e)
         {
-            if (isProgrammaticUpdate)
-                return;
-
             TextBox^ cell = safe_cast<TextBox^>(sender);
 
             if (cell->ReadOnly)
