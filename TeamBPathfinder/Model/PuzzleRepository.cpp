@@ -7,7 +7,7 @@ namespace Model
 {
 	PuzzleRepository::PuzzleRepository(const std::string& puzzleFilePath)
 	{
-		this->puzzles = PuzzleFileHandler::loadPuzzles(puzzleFilePath);
+		this->puzzles = Persistence::PuzzleFileHandler::loadPuzzles(puzzleFilePath);
 
 		if (this->puzzles.empty())
 		{

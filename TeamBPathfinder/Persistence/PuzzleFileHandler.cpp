@@ -1,99 +1,110 @@
 #include "PuzzleFileHandler.h"
+#include "../Common/Constants.h"
 
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 
-std::vector<Model::Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
+namespace Persistence
 {
-	std::ifstream file(filePath);
+	static const std::string PUZZLE_NUMBER_LABEL = "PuzzleNumber:";
+	static const std::string CLUES_LABEL = "Clues:";
+	static const std::string SOLUTION_LABEL = "Solution:";
+	static const std::string END_PUZZLE_LABEL = "EndPuzzle";
 
-	if (!file)
+	std::vector<Model::Puzzle> PuzzleFileHandler::loadPuzzles(const std::string& filePath)
 	{
-		throw std::runtime_error("Could not open puzzle file: " + filePath);
-	}
+		std::ifstream file(filePath);
 
-	std::vector<Model::Puzzle> puzzles;
-	std::string line;
-	Model::Puzzle currentPuzzle;
-	bool hasCurrentPuzzle = false;
-	bool readingClues = false;
-	bool readingSolution = false;
-	int solutionRow = 0;
-
-	while (std::getline(file, line))
-	{
-		if (line.empty())
-			continue;
-
-		if (line.find("PuzzleNumber:") == 0)
+		if (!file)
 		{
-			int puzzleNumber = std::stoi(line.substr(line.find(":") + 1));
-			currentPuzzle = Model::Puzzle(puzzleNumber);
-
-			hasCurrentPuzzle = true;
-			readingClues = false;
-			readingSolution = false;
-			solutionRow = 0;
+			throw std::runtime_error("Could not open puzzle file: " + filePath);
 		}
-		else if (line == "Clues:")
+
+		std::vector<Model::Puzzle> puzzles;
+		std::string line;
+		Model::Puzzle currentPuzzle;
+		bool hasCurrentPuzzle = false;
+		bool readingClues = false;
+		bool readingSolution = false;
+		int solutionRow = 0;
+
+		while (std::getline(file, line))
 		{
-			readingClues = true;
-			readingSolution = false;
-		}
-		else if (line == "Solution:")
-		{
-			readingClues = false;
-			readingSolution = true;
-			solutionRow = 0;
-		}
-		else if (line == "EndPuzzle")
-		{
-			if (hasCurrentPuzzle)
+			if (line.empty())
 			{
-				puzzles.push_back(currentPuzzle);
+				continue;
 			}
 
-			hasCurrentPuzzle = false;
-			readingClues = false;
-			readingSolution = false;
-			solutionRow = 0;
+			if (line.find(PUZZLE_NUMBER_LABEL) == 0)
+			{
+				int puzzleNumber = std::stoi(line.substr(PUZZLE_NUMBER_LABEL.length()));
+				currentPuzzle = Model::Puzzle(puzzleNumber);
+
+				hasCurrentPuzzle = true;
+				readingClues = false;
+				readingSolution = false;
+				solutionRow = 0;
+			}
+			else if (line == CLUES_LABEL)
+			{
+				readingClues = true;
+				readingSolution = false;
+			}
+			else if (line == SOLUTION_LABEL)
+			{
+				readingClues = false;
+				readingSolution = true;
+				solutionRow = 0;
+			}
+			else if (line == END_PUZZLE_LABEL)
+			{
+				if (hasCurrentPuzzle)
+				{
+					puzzles.push_back(currentPuzzle);
+				}
+
+				hasCurrentPuzzle = false;
+				readingClues = false;
+				readingSolution = false;
+				solutionRow = 0;
+			}
+			else if (readingClues)
+			{
+				readClueLine(currentPuzzle, line);
+			}
+			else if (readingSolution)
+			{
+				readSolutionRow(currentPuzzle, line, solutionRow);
+				solutionRow++;
+			}
 		}
-		else if (readingClues)
-		{
-			readClueLine(currentPuzzle, line);
-		}
-		else if (readingSolution)
-		{
-			readSolutionRow(currentPuzzle, line, solutionRow);
-			solutionRow++;
-		}
+
+		return puzzles;
 	}
 
-	return puzzles;
-}
-
-void PuzzleFileHandler::readClueLine(Model::Puzzle& puzzle, const std::string& line)
-{
-	std::stringstream ss(line);
-
-	int row;
-	int col;
-	int value;
-
-	ss >> row >> col >> value;
-
-	puzzle.addClue(row, col, value);
-}
-
-void PuzzleFileHandler::readSolutionRow(Model::Puzzle& puzzle, const std::string& line, int row)
-{
-	std::stringstream ss(line);
-
-	for (int col = 0; col < 8; col++)
+	void PuzzleFileHandler::readClueLine(Model::Puzzle& puzzle, const std::string& line)
 	{
+		std::stringstream ss(line);
+
+		int row;
+		int col;
 		int value;
-		ss >> value;
-		puzzle.setSolution(row, col, value);
+
+		ss >> row >> col >> value;
+
+		puzzle.addClue(row, col, value);
+	}
+
+	void PuzzleFileHandler::readSolutionRow(Model::Puzzle& puzzle, const std::string& line, int row)
+	{
+		std::stringstream ss(line);
+
+		for (int col = 0; col < Constants::BOARD_COLUMN_SIZE; col++)
+		{
+			int value;
+			ss >> value;
+			puzzle.setSolution(row, col, value);
+		}
 	}
 }
