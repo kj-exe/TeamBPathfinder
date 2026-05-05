@@ -83,6 +83,15 @@
     <ClInclude Include="Engine\GameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="View\BoardCoordinator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="View\GameBoyChrome.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="View\GamepadInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="View\GridPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
