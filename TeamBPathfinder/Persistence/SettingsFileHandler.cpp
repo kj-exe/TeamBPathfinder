@@ -2,37 +2,60 @@
 
 #include <fstream>
 
-bool SettingsFileHandler::saveSettings(const std::string& filePath, const Model::UserSettings& settings)
+namespace Persistence
 {
-    std::ofstream file(filePath);
+	static const std::string CELL_COLOR_LABEL = "CellColor: ";
+	static const std::string NUMBER_COLOR_LABEL = "NumberColor: ";
+	static const std::string FIXED_CELL_COLOR_LABEL = "FixedCellColor: ";
 
-    if (!file)
-        return false;
+	bool SettingsFileHandler::saveSettings(const std::string& filePath, const Model::UserSettings& settings)
+	{
+		std::ofstream file(filePath);
 
-    file << "CellColor: " << settings.getCellColor() << std::endl;
-    file << "NumberColor: " << settings.getNumberColor() << std::endl;
-    file << "FixedCellColor: " << settings.getFixedCellColor() << std::endl;
+		if (!file)
+		{
+			return false;
+		}
 
-    return true;
-}
+		file << CELL_COLOR_LABEL << settings.getCellColor() << std::endl;
+		file << NUMBER_COLOR_LABEL << settings.getNumberColor() << std::endl;
+		file << FIXED_CELL_COLOR_LABEL << settings.getFixedCellColor() << std::endl;
 
-bool SettingsFileHandler::loadSettings(const std::string& filePath, Model::UserSettings& settings)
-{
-    std::ifstream file(filePath);
+		return true;
+	}
 
-    if (!file)
-        return false;
+	bool SettingsFileHandler::loadSettings(const std::string& filePath, Model::UserSettings& settings)
+	{
+		std::ifstream file(filePath);
 
-    std::string line;
+		if (!file)
+		{
+			return false;
+		}
 
-    if (!std::getline(file, line)) return false;
-    settings.setCellColor(std::stoi(line.substr(line.find(":") + 1)));
+		std::string line;
 
-    if (!std::getline(file, line)) return false;
-    settings.setNumberColor(std::stoi(line.substr(line.find(":") + 1)));
+		if (!std::getline(file, line))
+		{
+			return false;
+		}
 
-    if (!std::getline(file, line)) return false;
-    settings.setFixedCellColor(std::stoi(line.substr(line.find(":") + 1)));
+		settings.setCellColor(std::stoi(line.substr(CELL_COLOR_LABEL.length())));
 
-    return true;
+		if (!std::getline(file, line))
+		{
+			return false;
+		}
+
+		settings.setNumberColor(std::stoi(line.substr(NUMBER_COLOR_LABEL.length())));
+
+		if (!std::getline(file, line))
+		{
+			return false;
+		}
+
+		settings.setFixedCellColor(std::stoi(line.substr(FIXED_CELL_COLOR_LABEL.length())));
+
+		return true;
+	}
 }
