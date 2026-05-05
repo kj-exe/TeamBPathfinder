@@ -44,8 +44,17 @@ namespace TeamBPathfinder {
         void refreshGrid()
         {
             for (int row = 0; row < GridPanel::BOARD_SIZE; row++)
+            {
                 for (int col = 0; col < GridPanel::BOARD_SIZE; col++)
-                    gridPanel->UpdateCell(row, col, controller->getValue(row, col), controller->isFixed(row, col));
+                {
+                    gridPanel->setCellValue(
+                        row,
+                        col,
+                        controller->getValue(row, col),
+                        controller->isFixed(row, col)
+                    );
+                }
+            }
         }
 
         void refreshPuzzleLabel()

@@ -31,7 +31,7 @@ namespace Engine
 		}
 	}
 
-	void GameEngine::setFixed(int row, int col, int value)
+	void GameEngine::setFixed(const int row, const int col, int value)
 	{
 		board[row][col] = value;
 		fixed[row][col] = true;

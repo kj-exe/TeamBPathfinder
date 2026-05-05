@@ -65,30 +65,30 @@ namespace TeamBPathfinder {
 
         void moveSelection(int rowDelta, int colDelta)
         {
-            int newRow = gridPanel->GetSelectedRow() + rowDelta;
-            int newCol = gridPanel->GetSelectedCol() + colDelta;
+            int newRow = gridPanel->getSelectedRow() + rowDelta;
+            int newCol = gridPanel->getSelectedCol() + colDelta;
 
             if (newRow < 0 || newRow >= GridPanel::BOARD_SIZE) return;
             if (newCol < 0 || newCol >= GridPanel::BOARD_SIZE) return;
 
             // Notice we do NOT clear ActiveControl here anymore. 
             // The form handles its own ActiveControl clearing when necessary.
-            gridPanel->SetSelectedCell(newRow, newCol);
-            gridPanel->FocusSelectedCell();
+            gridPanel->selectCell(newRow, newCol);
+            gridPanel->focusSelectedCell();
         }
 
         void pressA()
         {
             if (controller->isCurrentPuzzleSolved()) return;
 
-            int row = gridPanel->GetSelectedRow();
-            int col = gridPanel->GetSelectedCol();
+            int row = gridPanel->getSelectedRow();
+            int col = gridPanel->getSelectedCol();
 
             if (controller->isFixed(row, col) || controller->getValue(row, col) > 0)
             {
                 if (!findNextEmptyCell(row, col))
                     return;
-                gridPanel->SetSelectedCell(row, col);
+                gridPanel->selectCell(row, col);
             }
 
             int nextNumber = computeNextAvailableNumber();
@@ -97,8 +97,8 @@ namespace TeamBPathfinder {
             Controller::MoveResult result = controller->attemptMove(row, col, nextNumber);
             if (result == Controller::MoveResult::Accepted)
             {
-                gridPanel->UpdateCell(row, col, nextNumber, false);
-                gridPanel->ResetCellColor(row, col);
+                gridPanel->setCellValue(row, col, nextNumber, false);
+                gridPanel->resetCellStyle(row, col);
             }
         }
 
@@ -106,14 +106,14 @@ namespace TeamBPathfinder {
         {
             if (controller->isCurrentPuzzleSolved()) return;
 
-            int row = gridPanel->GetSelectedRow();
-            int col = gridPanel->GetSelectedCol();
+            int row = gridPanel->getSelectedRow();
+            int col = gridPanel->getSelectedCol();
 
             if (controller->isFixed(row, col)) return;
 
             controller->clearCell(row, col);
-            gridPanel->UpdateCell(row, col, 0, false);
-            gridPanel->ResetCellColor(row, col);
+            gridPanel->setCellValue(row, col, 0, false);
+            gridPanel->resetCellStyle(row, col);
         }
     };
 }

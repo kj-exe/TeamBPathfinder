@@ -58,7 +58,6 @@ namespace TeamBPathfinder
             return HitResult::None;
         }
 
-        // Layout constants � exposed for MainForm to align its own controls
         static const int GRID_MARGIN = 28;
         static const int MENU_HEIGHT = 24;
         static const int BRAND_TOP = MENU_HEIGHT + 14;
@@ -70,7 +69,6 @@ namespace TeamBPathfinder
         static const int BOTTOM_BTN_H = 38;
         static const int BOTTOM_BTN_GAP = 14;
 
-        // Plastic palette � exposed so labels/buttons can match the skin
         static initonly Color PLASTIC = Color::FromArgb(196, 190, 183);
         static initonly Color PLASTIC_HI = Color::FromArgb(220, 215, 208);
         static initonly Color PLASTIC_LO = Color::FromArgb(150, 144, 138);
@@ -121,11 +119,9 @@ namespace TeamBPathfinder
 
             int hArmX = dpadCenterX - DPAD_ARM_LENGTH - 12;
             int hArmY = dpadCenterY - DPAD_ARM_THICKNESS / 2;
-            int hArmW = (DPAD_ARM_LENGTH + 12) * 2;
 
             int vArmX = dpadCenterX - DPAD_ARM_THICKNESS / 2;
             int vArmY = dpadCenterY - DPAD_ARM_LENGTH - 12;
-            int vArmH = (DPAD_ARM_LENGTH + 12) * 2;
 
             dpadUp = Drawing::Rectangle(vArmX, vArmY, DPAD_ARM_THICKNESS, DPAD_ARM_THICKNESS + 12);
             dpadDown = Drawing::Rectangle(vArmX, dpadCenterY, DPAD_ARM_THICKNESS, DPAD_ARM_THICKNESS + 12);
@@ -447,6 +443,8 @@ namespace TeamBPathfinder
                 points[0] = Point(cx - size, cy);
                 points[1] = Point(cx + size, cy - size);
                 points[2] = Point(cx + size, cy + size);
+                break;
+            default:
                 break;
             }
             g->FillPolygon(brush, points);
